@@ -23,32 +23,32 @@ type APIClient struct {
 	*internal.APIClient
 
 	// API Services
-	AddressAPI AddressAPI
-	AddressBlockAPI AddressBlockAPI
-	AsmAPI AsmAPI
-	ConfigProfileAPI ConfigProfileAPI
-	DhcpHostAPI DhcpHostAPI
+	AddressAPI              AddressAPI
+	AddressBlockAPI         AddressBlockAPI
+	AsmAPI                  AsmAPI
+	ConfigProfileAPI        ConfigProfileAPI
+	DhcpHostAPI             DhcpHostAPI
 	DhcpUniversalServiceAPI DhcpUniversalServiceAPI
-	DnsUsageAPI DnsUsageAPI
-	ExportTableAPI ExportTableAPI
-	FilterAPI FilterAPI
-	FixedAddressAPI FixedAddressAPI
-	GlobalAPI GlobalAPI
-	HaGroupAPI HaGroupAPI
-	HardwareFilterAPI HardwareFilterAPI
-	IpSpaceAPI IpSpaceAPI
-	IpamHostAPI IpamHostAPI
-	LeasesCommandAPI LeasesCommandAPI
-	MacAddressItemAPI MacAddressItemAPI
-	OptionCodeAPI OptionCodeAPI
-	OptionFilterAPI OptionFilterAPI
-	OptionGroupAPI OptionGroupAPI
-	OptionSpaceAPI OptionSpaceAPI
-	RangeAPI RangeAPI
-	ServerAPI ServerAPI
-	ServiceAPI ServiceAPI
-	SharedNetworkAPI SharedNetworkAPI
-	SubnetAPI SubnetAPI
+	DnsUsageAPI             DnsUsageAPI
+	ExportTableAPI          ExportTableAPI
+	FilterAPI               FilterAPI
+	FixedAddressAPI         FixedAddressAPI
+	GlobalAPI               GlobalAPI
+	HaGroupAPI              HaGroupAPI
+	HardwareFilterAPI       HardwareFilterAPI
+	IpSpaceAPI              IpSpaceAPI
+	IpamHostAPI             IpamHostAPI
+	LeasesCommandAPI        LeasesCommandAPI
+	MacAddressItemAPI       MacAddressItemAPI
+	OptionCodeAPI           OptionCodeAPI
+	OptionFilterAPI         OptionFilterAPI
+	OptionGroupAPI          OptionGroupAPI
+	OptionSpaceAPI          OptionSpaceAPI
+	RangeAPI                RangeAPI
+	ServerAPI               ServerAPI
+	ServiceAPI              ServiceAPI
+	SharedNetworkAPI        SharedNetworkAPI
+	SubnetAPI               SubnetAPI
 }
 
 // NewAPIClient creates a new API client.
