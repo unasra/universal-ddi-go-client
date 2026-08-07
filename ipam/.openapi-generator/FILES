@@ -147,7 +147,6 @@ docs/InheritedDHCPOptionItem.md
 docs/InheritedDHCPOptionList.md
 docs/InheritedHostnameRewriteBlock.md
 docs/InheritedLoggingConfig.md
-docs/Integer128.md
 docs/IpSpaceAPI.md
 docs/IpamHost.md
 docs/IpamHostAPI.md
@@ -373,7 +372,6 @@ model_inherited_dhcp_option_item.go
 model_inherited_dhcp_option_list.go
 model_inherited_hostname_rewrite_block.go
 model_inherited_logging_config.go
-model_integer128.go
 model_ip_space.go
 model_ip_space_inheritance.go
 model_ipam_host.go

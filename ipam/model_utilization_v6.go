@@ -19,16 +19,11 @@ var _ MappedNullable = &UtilizationV6{}
 
 // UtilizationV6 The __UtilizationV6__ object represents IPV6 address usage statistics for an object.
 type UtilizationV6 struct {
-	// The number of IPV6 addresses in the scope of the object which are in the abandoned state (issued by a DHCP server and then declined by the client).
-	Abandoned *Integer128 `json:"abandoned,omitempty"`
-	// The number of IPV6 addresses handed out by DHCP in the scope of the object. This includes all leased addresses, fixed addresses that are defined but not currently leased and abandoned leases.
-	Dynamic *Integer128 `json:"dynamic,omitempty"`
-	// The number of defined IPV6 addresses such as reservations or DNS records. It can be computed as _static_ = _used_ - _dynamic_.
-	Static *Integer128 `json:"static,omitempty"`
-	// The total number of IPV6 addresses available in the scope of the object.
-	Total *Integer128 `json:"total,omitempty"`
-	// The number of IPV6 addresses used in the scope of the object.
-	Used                 *Integer128 `json:"used,omitempty"`
+	Abandoned            *string `json:"abandoned,omitempty"`
+	Dynamic              *string `json:"dynamic,omitempty"`
+	Static               *string `json:"static,omitempty"`
+	Total                *string `json:"total,omitempty"`
+	Used                 *string `json:"used,omitempty"`
 	AdditionalProperties map[string]interface{}
 }
 
@@ -52,9 +47,9 @@ func NewUtilizationV6WithDefaults() *UtilizationV6 {
 }
 
 // GetAbandoned returns the Abandoned field value if set, zero value otherwise.
-func (o *UtilizationV6) GetAbandoned() Integer128 {
+func (o *UtilizationV6) GetAbandoned() string {
 	if o == nil || IsNil(o.Abandoned) {
-		var ret Integer128
+		var ret string
 		return ret
 	}
 	return *o.Abandoned
@@ -62,7 +57,7 @@ func (o *UtilizationV6) GetAbandoned() Integer128 {
 
 // GetAbandonedOk returns a tuple with the Abandoned field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UtilizationV6) GetAbandonedOk() (*Integer128, bool) {
+func (o *UtilizationV6) GetAbandonedOk() (*string, bool) {
 	if o == nil || IsNil(o.Abandoned) {
 		return nil, false
 	}
@@ -78,15 +73,15 @@ func (o *UtilizationV6) HasAbandoned() bool {
 	return false
 }
 
-// SetAbandoned gets a reference to the given Integer128 and assigns it to the Abandoned field.
-func (o *UtilizationV6) SetAbandoned(v Integer128) {
+// SetAbandoned gets a reference to the given string and assigns it to the Abandoned field.
+func (o *UtilizationV6) SetAbandoned(v string) {
 	o.Abandoned = &v
 }
 
 // GetDynamic returns the Dynamic field value if set, zero value otherwise.
-func (o *UtilizationV6) GetDynamic() Integer128 {
+func (o *UtilizationV6) GetDynamic() string {
 	if o == nil || IsNil(o.Dynamic) {
-		var ret Integer128
+		var ret string
 		return ret
 	}
 	return *o.Dynamic
@@ -94,7 +89,7 @@ func (o *UtilizationV6) GetDynamic() Integer128 {
 
 // GetDynamicOk returns a tuple with the Dynamic field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UtilizationV6) GetDynamicOk() (*Integer128, bool) {
+func (o *UtilizationV6) GetDynamicOk() (*string, bool) {
 	if o == nil || IsNil(o.Dynamic) {
 		return nil, false
 	}
@@ -110,15 +105,15 @@ func (o *UtilizationV6) HasDynamic() bool {
 	return false
 }
 
-// SetDynamic gets a reference to the given Integer128 and assigns it to the Dynamic field.
-func (o *UtilizationV6) SetDynamic(v Integer128) {
+// SetDynamic gets a reference to the given string and assigns it to the Dynamic field.
+func (o *UtilizationV6) SetDynamic(v string) {
 	o.Dynamic = &v
 }
 
 // GetStatic returns the Static field value if set, zero value otherwise.
-func (o *UtilizationV6) GetStatic() Integer128 {
+func (o *UtilizationV6) GetStatic() string {
 	if o == nil || IsNil(o.Static) {
-		var ret Integer128
+		var ret string
 		return ret
 	}
 	return *o.Static
@@ -126,7 +121,7 @@ func (o *UtilizationV6) GetStatic() Integer128 {
 
 // GetStaticOk returns a tuple with the Static field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UtilizationV6) GetStaticOk() (*Integer128, bool) {
+func (o *UtilizationV6) GetStaticOk() (*string, bool) {
 	if o == nil || IsNil(o.Static) {
 		return nil, false
 	}
@@ -142,15 +137,15 @@ func (o *UtilizationV6) HasStatic() bool {
 	return false
 }
 
-// SetStatic gets a reference to the given Integer128 and assigns it to the Static field.
-func (o *UtilizationV6) SetStatic(v Integer128) {
+// SetStatic gets a reference to the given string and assigns it to the Static field.
+func (o *UtilizationV6) SetStatic(v string) {
 	o.Static = &v
 }
 
 // GetTotal returns the Total field value if set, zero value otherwise.
-func (o *UtilizationV6) GetTotal() Integer128 {
+func (o *UtilizationV6) GetTotal() string {
 	if o == nil || IsNil(o.Total) {
-		var ret Integer128
+		var ret string
 		return ret
 	}
 	return *o.Total
@@ -158,7 +153,7 @@ func (o *UtilizationV6) GetTotal() Integer128 {
 
 // GetTotalOk returns a tuple with the Total field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UtilizationV6) GetTotalOk() (*Integer128, bool) {
+func (o *UtilizationV6) GetTotalOk() (*string, bool) {
 	if o == nil || IsNil(o.Total) {
 		return nil, false
 	}
@@ -174,15 +169,15 @@ func (o *UtilizationV6) HasTotal() bool {
 	return false
 }
 
-// SetTotal gets a reference to the given Integer128 and assigns it to the Total field.
-func (o *UtilizationV6) SetTotal(v Integer128) {
+// SetTotal gets a reference to the given string and assigns it to the Total field.
+func (o *UtilizationV6) SetTotal(v string) {
 	o.Total = &v
 }
 
 // GetUsed returns the Used field value if set, zero value otherwise.
-func (o *UtilizationV6) GetUsed() Integer128 {
+func (o *UtilizationV6) GetUsed() string {
 	if o == nil || IsNil(o.Used) {
-		var ret Integer128
+		var ret string
 		return ret
 	}
 	return *o.Used
@@ -190,7 +185,7 @@ func (o *UtilizationV6) GetUsed() Integer128 {
 
 // GetUsedOk returns a tuple with the Used field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UtilizationV6) GetUsedOk() (*Integer128, bool) {
+func (o *UtilizationV6) GetUsedOk() (*string, bool) {
 	if o == nil || IsNil(o.Used) {
 		return nil, false
 	}
@@ -206,8 +201,8 @@ func (o *UtilizationV6) HasUsed() bool {
 	return false
 }
 
-// SetUsed gets a reference to the given Integer128 and assigns it to the Used field.
-func (o *UtilizationV6) SetUsed(v Integer128) {
+// SetUsed gets a reference to the given string and assigns it to the Used field.
+func (o *UtilizationV6) SetUsed(v string) {
 	o.Used = &v
 }
 

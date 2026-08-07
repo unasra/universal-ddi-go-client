@@ -324,7 +324,6 @@ Class | Method | HTTP request | Description
  - [InheritedDHCPOptionList](docs/InheritedDHCPOptionList.md)
  - [InheritedHostnameRewriteBlock](docs/InheritedHostnameRewriteBlock.md)
  - [InheritedLoggingConfig](docs/InheritedLoggingConfig.md)
- - [Integer128](docs/Integer128.md)
  - [IpamHost](docs/IpamHost.md)
  - [IpamHostInheritance](docs/IpamHostInheritance.md)
  - [KerberosKey](docs/KerberosKey.md)
