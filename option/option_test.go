@@ -1,6 +1,7 @@
 package option
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -54,4 +55,35 @@ func TestWithDebug(t *testing.T) {
 	opt := WithDebug(true)
 	opt(config)
 	assert.Equal(t, true, config.Debug)
+}
+
+func TestWithRateLimit(t *testing.T) {
+	config1 := &internal.Configuration{}
+	config2 := &internal.Configuration{}
+	opt := WithRateLimit(10, 5)
+	opt(config1)
+	opt(config2)
+	assert.NotNil(t, config1.RateLimiter)
+	assert.NotNil(t, config2.RateLimiter)
+	// Same limiter instance should be shared
+	assert.Same(t, config1.RateLimiter, config2.RateLimiter)
+}
+
+type mockRateLimiter struct{}
+
+func (m *mockRateLimiter) Wait(ctx context.Context) error { return nil }
+
+func TestWithRateLimiter(t *testing.T) {
+	config := &internal.Configuration{}
+	limiter := &mockRateLimiter{}
+	opt := WithRateLimiter(limiter)
+	opt(config)
+	assert.Equal(t, limiter, config.RateLimiter)
+}
+
+func TestWithRateLimiterNil(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRateLimiter(nil)
+	opt(config)
+	assert.Nil(t, config.RateLimiter)
 }
