@@ -91,7 +91,7 @@ func NewConfiguration() *Configuration {
 		DefaultTags:      make(map[string]string),
 	}
 
-	rateLimit := lookupEnvFloat64(envRateLimit, defaultRateLimit)
+	rateLimit := lookupEnvFloat64(envRateLimit, 0)
 	if rateLimit > 0 {
 		burst := lookupEnvInt(envRateLimitBurst, int(math.Ceil(rateLimit)))
 		cfg.RateLimiter = rate.NewLimiter(rate.Limit(rateLimit), burst)

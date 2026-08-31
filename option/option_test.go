@@ -57,16 +57,19 @@ func TestWithDebug(t *testing.T) {
 	assert.Equal(t, true, config.Debug)
 }
 
-func TestWithRateLimit(t *testing.T) {
-	config1 := &internal.Configuration{}
-	config2 := &internal.Configuration{}
-	opt := WithRateLimit(10, 5)
-	opt(config1)
-	opt(config2)
-	assert.NotNil(t, config1.RateLimiter)
-	assert.NotNil(t, config2.RateLimiter)
-	// Same limiter instance should be shared
-	assert.Same(t, config1.RateLimiter, config2.RateLimiter)
+func TestWithRateLimitEnable(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRateLimit(true)
+	opt(config)
+	assert.NotNil(t, config.RateLimiter)
+}
+
+func TestWithRateLimitDisable(t *testing.T) {
+	config := &internal.Configuration{}
+	config.RateLimiter = &mockRateLimiter{}
+	opt := WithRateLimit(false)
+	opt(config)
+	assert.Nil(t, config.RateLimiter)
 }
 
 type mockRateLimiter struct{}

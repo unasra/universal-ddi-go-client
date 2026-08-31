@@ -37,7 +37,12 @@ const (
 	envRateLimit      = "INFOBLOX_RATE_LIMIT"
 	envRateLimitBurst = "INFOBLOX_RATE_LIMIT_BURST"
 
-	defaultRateLimit = 25
+	// DefaultRateLimit is the sustained request rate (requests per second) applied when
+	// rate limiting is enabled via WithRateLimit(true).
+	DefaultRateLimit float64 = 25
+	// DefaultRateLimitBurst is the burst size applied when rate limiting is enabled via
+	// WithRateLimit(true).
+	DefaultRateLimitBurst int = 25
 
 	version       = "0.1"
 	sdkIdentifier = "golang-sdk"

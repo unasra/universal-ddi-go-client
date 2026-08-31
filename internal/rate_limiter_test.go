@@ -132,14 +132,14 @@ func TestNewConfigurationRateLimitBurstFromEnv(t *testing.T) {
 
 func TestNewConfigurationDefaultRateLimit(t *testing.T) {
 	cfg := NewConfiguration()
-	assert.NotNil(t, cfg.RateLimiter, "rate limiter should be enabled by default")
+	assert.Nil(t, cfg.RateLimiter, "rate limiter should be disabled by default")
 }
 
 func TestNewConfigurationRateLimitInvalidEnv(t *testing.T) {
 	t.Setenv("INFOBLOX_RATE_LIMIT", "not-a-number")
 
 	cfg := NewConfiguration()
-	assert.NotNil(t, cfg.RateLimiter, "invalid env should fall back to default")
+	assert.Nil(t, cfg.RateLimiter, "invalid env value should leave rate limiting disabled")
 }
 
 func TestNewConfigurationRateLimitDisabledByEnv(t *testing.T) {

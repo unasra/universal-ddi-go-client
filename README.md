@@ -136,38 +136,38 @@ This will add the tags `tag1=value1` and `tag2=value2` to all API requests that 
 
 The SDK includes a built-in token-bucket rate limiter that throttles outbound API requests. This prevents overwhelming the API server with too many concurrent requests, which can result in `429 Too Many Requests` or `500 Internal Server Error` responses — particularly when used with tools like Terraform that make parallel API calls.
 
-**The rate limiter is enabled by default at 25 requests per second with a burst size of 25.**
+**The rate limiter is disabled by default.** Enable it explicitly when you need to throttle outbound requests.
 
 #### Environment Variables
 
-You can tune or disable the rate limiter using environment variables:
+You can enable and tune the rate limiter using environment variables:
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `INFOBLOX_RATE_LIMIT` | float | `25` | Requests per second. Set to `0` to disable rate limiting. |
-| `INFOBLOX_RATE_LIMIT_BURST` | int | Same as rate limit | Maximum number of requests that can be made instantly before throttling kicks in. |
+| `INFOBLOX_RATE_LIMIT` | float | `0` (disabled) | Requests per second. Set to a positive value to enable rate limiting. |
+| `INFOBLOX_RATE_LIMIT_BURST` | int | Same as rate limit | Maximum number of requests that can be made instantly before throttling kicks in. Only takes effect when `INFOBLOX_RATE_LIMIT` is set. |
 
 ```bash
-# Override the default rate limit
+# Enable rate limiting at 10 requests/second
 export INFOBLOX_RATE_LIMIT=10
 export INFOBLOX_RATE_LIMIT_BURST=5
-
-# Disable rate limiting entirely
-export INFOBLOX_RATE_LIMIT=0
 ```
 
 #### Programmatic Configuration
 
-You can configure the rate limiter using functional options:
+You can enable or disable the rate limiter using `option.WithRateLimit`:
 
 ```go
-// Set a rate limit of 10 requests/second with a burst of 5
-client := uddiclient.NewAPIClient(option.WithRateLimit(10, 5))
+// Explicitly enable rate limiting with default values (25 req/s, burst 25)
+client := uddiclient.NewAPIClient(option.WithRateLimit(true))
+
+// Disable rate limiting entirely
+client := uddiclient.NewAPIClient(option.WithRateLimit(false))
 ```
 
 When using the aggregated client (`client.NewAPIClient`), the rate limiter is shared across all services, so the configured rate applies to the total request throughput across all API endpoints.
 
-You can also provide a custom rate limiter implementation using `option.WithRateLimiter`:
+For non-default rate values, provide a custom rate limiter using `option.WithRateLimiter`:
 
 ```go
 client := uddiclient.NewAPIClient(option.WithRateLimiter(myCustomLimiter))
