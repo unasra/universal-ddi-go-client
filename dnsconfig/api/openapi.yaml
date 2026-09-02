@@ -5228,6 +5228,7 @@ components:
           max_cache_ttl: 5
           dnssec_enabled: true
           match_recursive_only: true
+          secondary_zone_records_sync: true
           recursion_acl:
           - access: allow
             address: address
@@ -5253,6 +5254,22 @@ components:
             element: ip
           lame_ttl: 5
           forwarders_only: true
+          dnssec_signing_policy:
+            ksk_rollover_interval: 2
+            nsec3_iterations: 7
+            ksk_notification_event_trigger: ksk_notification_event_trigger
+            nsec_type: nsec_type
+            zsk_signature_validity: 2
+            keys:
+            - size: 5
+              type: type
+              algorithm: 5
+            - size: 5
+              type: type
+              algorithm: 5
+            nsec3_salt_length: 9
+            zsk_rollover_interval: 3
+            ksk_automatic_rollover_enabled: true
           gss_tsig_enabled: true
           ecs_zones:
           - access: allow
@@ -5282,6 +5299,11 @@ components:
             sep: true
           tags: "{}"
           max_negative_ttl: 2
+          dnssec_validate_exceptions:
+          - domain: domain
+            protocol_domain: protocol_domain
+          - domain: domain
+            protocol_domain: protocol_domain
           zone_authority:
             rname: rname
             default_ttl: 1
@@ -5300,7 +5322,7 @@ components:
           - address: 10.0.0.0
             fqdn: ns1.example.com
             protocol_fqdn: protocol_fqdn
-          name: Example Config View
+          name: name
           dnssec_validate_expiry: true
           filter_aaaa_on_v4: filter_aaaa_on_v4
           max_udp_size: 7
@@ -5396,6 +5418,7 @@ components:
             zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
             algorithm: 0
             sep: true
+          nios_metadata: "{}"
           inheritance_sources:
             max_cache_ttl:
               action: action
@@ -5443,6 +5466,11 @@ components:
                   fqdn: example.com
                   protocol_fqdn: test.key.com.
             match_recursive_only:
+              action: action
+              source: source
+              display_name: display_name
+              value: true
+            secondary_zone_records_sync:
               action: action
               source: source
               display_name: display_name
@@ -5804,6 +5832,7 @@ components:
             acl: acl
             element: ip
           comment: comment
+          external_providers_metadata: "{}"
           match_destinations_acl:
           - access: allow
             address: address
@@ -10723,6 +10752,7 @@ components:
         - max_cache_ttl: 5
           dnssec_enabled: true
           match_recursive_only: true
+          secondary_zone_records_sync: true
           recursion_acl:
           - access: allow
             address: address
@@ -10748,6 +10778,22 @@ components:
             element: ip
           lame_ttl: 5
           forwarders_only: true
+          dnssec_signing_policy:
+            ksk_rollover_interval: 2
+            nsec3_iterations: 7
+            ksk_notification_event_trigger: ksk_notification_event_trigger
+            nsec_type: nsec_type
+            zsk_signature_validity: 2
+            keys:
+            - size: 5
+              type: type
+              algorithm: 5
+            - size: 5
+              type: type
+              algorithm: 5
+            nsec3_salt_length: 9
+            zsk_rollover_interval: 3
+            ksk_automatic_rollover_enabled: true
           gss_tsig_enabled: true
           ecs_zones:
           - access: allow
@@ -10777,6 +10823,11 @@ components:
             sep: true
           tags: "{}"
           max_negative_ttl: 2
+          dnssec_validate_exceptions:
+          - domain: domain
+            protocol_domain: protocol_domain
+          - domain: domain
+            protocol_domain: protocol_domain
           zone_authority:
             rname: rname
             default_ttl: 1
@@ -10795,7 +10846,7 @@ components:
           - address: 10.0.0.0
             fqdn: ns1.example.com
             protocol_fqdn: protocol_fqdn
-          name: Example Config View
+          name: name
           dnssec_validate_expiry: true
           filter_aaaa_on_v4: filter_aaaa_on_v4
           max_udp_size: 7
@@ -10891,6 +10942,7 @@ components:
             zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
             algorithm: 0
             sep: true
+          nios_metadata: "{}"
           inheritance_sources:
             max_cache_ttl:
               action: action
@@ -10938,6 +10990,11 @@ components:
                   fqdn: example.com
                   protocol_fqdn: test.key.com.
             match_recursive_only:
+              action: action
+              source: source
+              display_name: display_name
+              value: true
+            secondary_zone_records_sync:
               action: action
               source: source
               display_name: display_name
@@ -11299,6 +11356,7 @@ components:
             acl: acl
             element: ip
           comment: comment
+          external_providers_metadata: "{}"
           match_destinations_acl:
           - access: allow
             address: address
@@ -11348,6 +11406,7 @@ components:
         - max_cache_ttl: 5
           dnssec_enabled: true
           match_recursive_only: true
+          secondary_zone_records_sync: true
           recursion_acl:
           - access: allow
             address: address
@@ -11373,6 +11432,22 @@ components:
             element: ip
           lame_ttl: 5
           forwarders_only: true
+          dnssec_signing_policy:
+            ksk_rollover_interval: 2
+            nsec3_iterations: 7
+            ksk_notification_event_trigger: ksk_notification_event_trigger
+            nsec_type: nsec_type
+            zsk_signature_validity: 2
+            keys:
+            - size: 5
+              type: type
+              algorithm: 5
+            - size: 5
+              type: type
+              algorithm: 5
+            nsec3_salt_length: 9
+            zsk_rollover_interval: 3
+            ksk_automatic_rollover_enabled: true
           gss_tsig_enabled: true
           ecs_zones:
           - access: allow
@@ -11402,6 +11477,11 @@ components:
             sep: true
           tags: "{}"
           max_negative_ttl: 2
+          dnssec_validate_exceptions:
+          - domain: domain
+            protocol_domain: protocol_domain
+          - domain: domain
+            protocol_domain: protocol_domain
           zone_authority:
             rname: rname
             default_ttl: 1
@@ -11420,7 +11500,7 @@ components:
           - address: 10.0.0.0
             fqdn: ns1.example.com
             protocol_fqdn: protocol_fqdn
-          name: Example Config View
+          name: name
           dnssec_validate_expiry: true
           filter_aaaa_on_v4: filter_aaaa_on_v4
           max_udp_size: 7
@@ -11516,6 +11596,7 @@ components:
             zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
             algorithm: 0
             sep: true
+          nios_metadata: "{}"
           inheritance_sources:
             max_cache_ttl:
               action: action
@@ -11563,6 +11644,11 @@ components:
                   fqdn: example.com
                   protocol_fqdn: test.key.com.
             match_recursive_only:
+              action: action
+              source: source
+              display_name: display_name
+              value: true
+            secondary_zone_records_sync:
               action: action
               source: source
               display_name: display_name
@@ -11924,6 +12010,7 @@ components:
             acl: acl
             element: ip
           comment: comment
+          external_providers_metadata: "{}"
           match_destinations_acl:
           - access: allow
             address: address
@@ -13619,6 +13706,7 @@ components:
           max_cache_ttl: 5
           dnssec_enabled: true
           match_recursive_only: true
+          secondary_zone_records_sync: true
           recursion_acl:
           - access: allow
             address: address
@@ -13644,6 +13732,22 @@ components:
             element: ip
           lame_ttl: 5
           forwarders_only: true
+          dnssec_signing_policy:
+            ksk_rollover_interval: 2
+            nsec3_iterations: 7
+            ksk_notification_event_trigger: ksk_notification_event_trigger
+            nsec_type: nsec_type
+            zsk_signature_validity: 2
+            keys:
+            - size: 5
+              type: type
+              algorithm: 5
+            - size: 5
+              type: type
+              algorithm: 5
+            nsec3_salt_length: 9
+            zsk_rollover_interval: 3
+            ksk_automatic_rollover_enabled: true
           gss_tsig_enabled: true
           ecs_zones:
           - access: allow
@@ -13673,6 +13777,11 @@ components:
             sep: true
           tags: "{}"
           max_negative_ttl: 2
+          dnssec_validate_exceptions:
+          - domain: domain
+            protocol_domain: protocol_domain
+          - domain: domain
+            protocol_domain: protocol_domain
           zone_authority:
             rname: rname
             default_ttl: 1
@@ -13691,7 +13800,7 @@ components:
           - address: 10.0.0.0
             fqdn: ns1.example.com
             protocol_fqdn: protocol_fqdn
-          name: Example Config View
+          name: name
           dnssec_validate_expiry: true
           filter_aaaa_on_v4: filter_aaaa_on_v4
           max_udp_size: 7
@@ -13787,6 +13896,7 @@ components:
             zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
             algorithm: 0
             sep: true
+          nios_metadata: "{}"
           inheritance_sources:
             max_cache_ttl:
               action: action
@@ -13834,6 +13944,11 @@ components:
                   fqdn: example.com
                   protocol_fqdn: test.key.com.
             match_recursive_only:
+              action: action
+              source: source
+              display_name: display_name
+              value: true
+            secondary_zone_records_sync:
               action: action
               source: source
               display_name: display_name
@@ -14195,6 +14310,7 @@ components:
             acl: acl
             element: ip
           comment: comment
+          external_providers_metadata: "{}"
           match_destinations_acl:
           - access: allow
             address: address
@@ -17302,6 +17418,7 @@ components:
           max_cache_ttl: 5
           dnssec_enabled: true
           match_recursive_only: true
+          secondary_zone_records_sync: true
           recursion_acl:
           - access: allow
             address: address
@@ -17327,6 +17444,22 @@ components:
             element: ip
           lame_ttl: 5
           forwarders_only: true
+          dnssec_signing_policy:
+            ksk_rollover_interval: 2
+            nsec3_iterations: 7
+            ksk_notification_event_trigger: ksk_notification_event_trigger
+            nsec_type: nsec_type
+            zsk_signature_validity: 2
+            keys:
+            - size: 5
+              type: type
+              algorithm: 5
+            - size: 5
+              type: type
+              algorithm: 5
+            nsec3_salt_length: 9
+            zsk_rollover_interval: 3
+            ksk_automatic_rollover_enabled: true
           gss_tsig_enabled: true
           ecs_zones:
           - access: allow
@@ -17356,6 +17489,11 @@ components:
             sep: true
           tags: "{}"
           max_negative_ttl: 2
+          dnssec_validate_exceptions:
+          - domain: domain
+            protocol_domain: protocol_domain
+          - domain: domain
+            protocol_domain: protocol_domain
           zone_authority:
             rname: rname
             default_ttl: 1
@@ -17374,7 +17512,7 @@ components:
           - address: 10.0.0.0
             fqdn: ns1.example.com
             protocol_fqdn: protocol_fqdn
-          name: Example Config View
+          name: name
           dnssec_validate_expiry: true
           filter_aaaa_on_v4: filter_aaaa_on_v4
           max_udp_size: 7
@@ -17470,6 +17608,7 @@ components:
             zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
             algorithm: 0
             sep: true
+          nios_metadata: "{}"
           inheritance_sources:
             max_cache_ttl:
               action: action
@@ -17517,6 +17656,11 @@ components:
                   fqdn: example.com
                   protocol_fqdn: test.key.com.
             match_recursive_only:
+              action: action
+              source: source
+              display_name: display_name
+              value: true
+            secondary_zone_records_sync:
               action: action
               source: source
               display_name: display_name
@@ -17878,6 +18022,7 @@ components:
             acl: acl
             element: ip
           comment: comment
+          external_providers_metadata: "{}"
           match_destinations_acl:
           - access: allow
             address: address
@@ -17935,6 +18080,7 @@ components:
         max_cache_ttl: 5
         dnssec_enabled: true
         match_recursive_only: true
+        secondary_zone_records_sync: true
         recursion_acl:
         - access: allow
           address: address
@@ -17960,6 +18106,22 @@ components:
           element: ip
         lame_ttl: 5
         forwarders_only: true
+        dnssec_signing_policy:
+          ksk_rollover_interval: 2
+          nsec3_iterations: 7
+          ksk_notification_event_trigger: ksk_notification_event_trigger
+          nsec_type: nsec_type
+          zsk_signature_validity: 2
+          keys:
+          - size: 5
+            type: type
+            algorithm: 5
+          - size: 5
+            type: type
+            algorithm: 5
+          nsec3_salt_length: 9
+          zsk_rollover_interval: 3
+          ksk_automatic_rollover_enabled: true
         gss_tsig_enabled: true
         ecs_zones:
         - access: allow
@@ -17989,6 +18151,11 @@ components:
           sep: true
         tags: "{}"
         max_negative_ttl: 2
+        dnssec_validate_exceptions:
+        - domain: domain
+          protocol_domain: protocol_domain
+        - domain: domain
+          protocol_domain: protocol_domain
         zone_authority:
           rname: rname
           default_ttl: 1
@@ -18007,7 +18174,7 @@ components:
         - address: 10.0.0.0
           fqdn: ns1.example.com
           protocol_fqdn: protocol_fqdn
-        name: Example Config View
+        name: name
         dnssec_validate_expiry: true
         filter_aaaa_on_v4: filter_aaaa_on_v4
         max_udp_size: 7
@@ -18103,6 +18270,7 @@ components:
           zone: dns/auth_zone/16d9158d-d0d7-48e1-9a55-087e7aa419d4
           algorithm: 0
           sep: true
+        nios_metadata: "{}"
         inheritance_sources:
           max_cache_ttl:
             action: action
@@ -18150,6 +18318,11 @@ components:
                 fqdn: example.com
                 protocol_fqdn: test.key.com.
           match_recursive_only:
+            action: action
+            source: source
+            display_name: display_name
+            value: true
+          secondary_zone_records_sync:
             action: action
             source: source
             display_name: display_name
@@ -18511,6 +18684,7 @@ components:
           acl: acl
           element: ip
         comment: comment
+        external_providers_metadata: "{}"
         match_destinations_acl:
         - access: allow
           address: address
@@ -18626,6 +18800,8 @@ components:
             $ref: '#/components/schemas/configTrustAnchor'
           readOnly: true
           type: array
+        dnssec_signing_policy:
+          $ref: '#/components/schemas/configDNSSECSigningPolicy'
         dnssec_trust_anchors:
           description: |-
             Optional. DNSSEC trust anchors.
@@ -18635,6 +18811,16 @@ components:
             Defaults to empty.
           items:
             $ref: '#/components/schemas/configTrustAnchor'
+          type: array
+        dnssec_validate_exceptions:
+          description: |-
+            Optional. DNSSEC validate exceptions.
+
+            Error if there are duplicate exception domains (compared as a DNS name including case-insensitive comparison).
+
+            Defaults to empty.
+          items:
+            $ref: '#/components/schemas/configDNSSECValidateException'
           type: array
         dnssec_validate_expiry:
           description: |-
@@ -18698,6 +18884,10 @@ components:
             Defaults to 1232 bytes.
           format: int64
           type: integer
+        external_providers_metadata:
+          additionalProperties: false
+          description: External DNS providers metadata.
+          type: object
         filter_aaaa_acl:
           description: |-
             Optional. Specifies a list of client addresses for which AAAA filtering is to be applied.
@@ -18820,8 +19010,11 @@ components:
           type: boolean
         name:
           description: Name of view.
-          example: Example Config View
           type: string
+        nios_metadata:
+          additionalProperties: false
+          description: NIOS Metadata holds NIOS grid's data.
+          type: object
         notify:
           description: |-
             _notify_ all external secondary DNS servers.
@@ -18851,6 +19044,13 @@ components:
             Optional. _true_ to allow recursive DNS queries.
 
             Defaults to _true_.
+          format: boolean
+          type: boolean
+        secondary_zone_records_sync:
+          description: |-
+            Optional. Defines if secondary zone records should be synchronized.
+
+            Defaults to _false_.
           format: boolean
           type: boolean
         sort_list:
@@ -18963,6 +19163,11 @@ components:
               fqdn: example.com
               protocol_fqdn: test.key.com.
         match_recursive_only:
+          action: action
+          source: source
+          display_name: display_name
+          value: true
+        secondary_zone_records_sync:
           action: action
           source: source
           display_name: display_name
@@ -19318,6 +19523,8 @@ components:
         recursion_acl:
           $ref: '#/components/schemas/configInheritedACLItems'
         recursion_enabled:
+          $ref: '#/components/schemas/inheritance2InheritedBool'
+        secondary_zone_records_sync:
           $ref: '#/components/schemas/inheritance2InheritedBool'
         sort_list:
           $ref: '#/components/schemas/configInheritedSortListItems'
