@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -70,6 +71,7 @@ type Configuration struct {
 	HTTPClient       *http.Client
 	DefaultTags      map[string]string
 	RateLimiter      RateLimiter
+	RetryConfig      *RetryConfig
 }
 
 // NewConfiguration returns a new Configuration object.
@@ -91,10 +93,19 @@ func NewConfiguration() *Configuration {
 		DefaultTags:      make(map[string]string),
 	}
 
-	rateLimit := lookupEnvFloat64(envRateLimit, 0)
+	rateLimit := lookupEnvFloat64(envRateLimit, defaultRateLimit)
 	if rateLimit > 0 {
 		burst := lookupEnvInt(envRateLimitBurst, int(math.Ceil(rateLimit)))
 		cfg.RateLimiter = rate.NewLimiter(rate.Limit(rateLimit), burst)
+	}
+
+	retryAttempts := lookupEnvInt(envRetryAttempts, DefaultRetryAttempts)
+	if retryAttempts > 0 {
+		cfg.RetryConfig = &RetryConfig{
+			MaxAttempts: retryAttempts,
+			MinWait:     lookupEnvDuration(envRetryMinWait, DefaultRetryMinWait),
+			MaxWait:     lookupEnvDuration(envRetryMaxWait, DefaultRetryMaxWait),
+		}
 	}
 
 	return cfg
@@ -245,6 +256,15 @@ func lookupEnvInt(key string, def int) int {
 	if v, ok := os.LookupEnv(key); ok {
 		if i, err := strconv.Atoi(v); err == nil {
 			return i
+		}
+	}
+	return def
+}
+
+func lookupEnvDuration(key string, def time.Duration) time.Duration {
+	if v, ok := os.LookupEnv(key); ok {
+		if d, err := time.ParseDuration(v); err == nil {
+			return d
 		}
 	}
 	return def

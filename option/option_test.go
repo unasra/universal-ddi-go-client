@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/infobloxopen/universal-ddi-go-client/internal"
 )
@@ -57,17 +59,21 @@ func TestWithDebug(t *testing.T) {
 	assert.Equal(t, true, config.Debug)
 }
 
-func TestWithRateLimitEnable(t *testing.T) {
-	config := &internal.Configuration{}
-	opt := WithRateLimit(true)
-	opt(config)
-	assert.NotNil(t, config.RateLimiter)
+func TestWithRateLimit(t *testing.T) {
+	config1 := &internal.Configuration{}
+	config2 := &internal.Configuration{}
+	opt := WithRateLimit(10, 5)
+	opt(config1)
+	opt(config2)
+	assert.NotNil(t, config1.RateLimiter)
+	assert.NotNil(t, config2.RateLimiter)
+	assert.Same(t, config1.RateLimiter, config2.RateLimiter, "same limiter instance should be shared")
 }
 
-func TestWithRateLimitDisable(t *testing.T) {
+func TestWithRateLimitDisabled(t *testing.T) {
 	config := &internal.Configuration{}
 	config.RateLimiter = &mockRateLimiter{}
-	opt := WithRateLimit(false)
+	opt := WithRateLimitDisabled()
 	opt(config)
 	assert.Nil(t, config.RateLimiter)
 }
@@ -89,4 +95,32 @@ func TestWithRateLimiterNil(t *testing.T) {
 	opt := WithRateLimiter(nil)
 	opt(config)
 	assert.Nil(t, config.RateLimiter)
+}
+
+func TestWithRetry(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRetry(5, 2*time.Second, 1*time.Minute)
+	opt(config)
+	require.NotNil(t, config.RetryConfig)
+	assert.Equal(t, 5, config.RetryConfig.MaxAttempts)
+	assert.Equal(t, 2*time.Second, config.RetryConfig.MinWait)
+	assert.Equal(t, 1*time.Minute, config.RetryConfig.MaxWait)
+}
+
+func TestWithRetryZeroDisables(t *testing.T) {
+	config := &internal.Configuration{
+		RetryConfig: &internal.RetryConfig{MaxAttempts: 3},
+	}
+	opt := WithRetry(0, 0, 0)
+	opt(config)
+	assert.Nil(t, config.RetryConfig, "zero attempts should disable retry")
+}
+
+func TestWithRetryDisabled(t *testing.T) {
+	config := &internal.Configuration{
+		RetryConfig: &internal.RetryConfig{MaxAttempts: 3},
+	}
+	opt := WithRetryDisabled()
+	opt(config)
+	assert.Nil(t, config.RetryConfig)
 }

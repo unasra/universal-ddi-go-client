@@ -136,38 +136,41 @@ This will add the tags `tag1=value1` and `tag2=value2` to all API requests that 
 
 The SDK includes a built-in token-bucket rate limiter that throttles outbound API requests. This prevents overwhelming the API server with too many concurrent requests, which can result in `429 Too Many Requests` or `500 Internal Server Error` responses — particularly when used with tools like Terraform that make parallel API calls.
 
-**The rate limiter is disabled by default.** Enable it explicitly when you need to throttle outbound requests.
+**The rate limiter is enabled by default at 25 requests per second with a burst size of 25.** No configuration is needed for most use cases.
 
 #### Environment Variables
 
-You can enable and tune the rate limiter using environment variables:
+You can tune or disable the rate limiter using environment variables:
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `INFOBLOX_RATE_LIMIT` | float | `0` (disabled) | Requests per second. Set to a positive value to enable rate limiting. |
-| `INFOBLOX_RATE_LIMIT_BURST` | int | Same as rate limit | Maximum number of requests that can be made instantly before throttling kicks in. Only takes effect when `INFOBLOX_RATE_LIMIT` is set. |
+| `INFOBLOX_RATE_LIMIT` | float | `25` | Requests per second. Set to `0` to disable rate limiting. |
+| `INFOBLOX_RATE_LIMIT_BURST` | int | Same as rate limit | Maximum number of requests that can be made instantly before throttling kicks in. |
 
 ```bash
-# Enable rate limiting at 10 requests/second
+# Override the default rate limit
 export INFOBLOX_RATE_LIMIT=10
 export INFOBLOX_RATE_LIMIT_BURST=5
+
+# Disable rate limiting entirely
+export INFOBLOX_RATE_LIMIT=0
 ```
 
 #### Programmatic Configuration
 
-You can enable or disable the rate limiter using `option.WithRateLimit`:
+You can configure the rate limiter using functional options:
 
 ```go
-// Explicitly enable rate limiting with default values (25 req/s, burst 25)
-client := uddiclient.NewAPIClient(option.WithRateLimit(true))
+// Set a rate limit of 10 requests/second with a burst of 5
+client := uddiclient.NewAPIClient(option.WithRateLimit(10, 5))
 
 // Disable rate limiting entirely
-client := uddiclient.NewAPIClient(option.WithRateLimit(false))
+client := uddiclient.NewAPIClient(option.WithRateLimitDisabled())
 ```
 
 When using the aggregated client (`client.NewAPIClient`), the rate limiter is shared across all services, so the configured rate applies to the total request throughput across all API endpoints.
 
-For non-default rate values, provide a custom rate limiter using `option.WithRateLimiter`:
+You can also provide a custom rate limiter implementation using `option.WithRateLimiter`:
 
 ```go
 client := uddiclient.NewAPIClient(option.WithRateLimiter(myCustomLimiter))
@@ -179,4 +182,45 @@ The custom limiter must implement the `internal.RateLimiter` interface:
 type RateLimiter interface {
     Wait(ctx context.Context) error
 }
+```
+
+### Retry
+
+The SDK automatically retries requests that fail with transient HTTP errors. This handles temporary server-side issues without requiring callers to implement their own retry logic.
+
+**Retry is enabled by default with 3 attempts, exponential backoff (1s–30s), and jitter.** The following HTTP status codes are retried:
+- `429 Too Many Requests`
+- `500 Internal Server Error`
+- `502 Bad Gateway`
+- `503 Service Unavailable`
+- `504 Gateway Timeout`
+
+When the server returns a `Retry-After` header with a `429` response, the SDK respects the indicated wait duration (capped to the configured maximum wait).
+
+#### Environment Variables
+
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `INFOBLOX_RETRY_ATTEMPTS` | int | `3` | Maximum number of retry attempts. Set to `0` to disable retry. |
+| `INFOBLOX_RETRY_MIN_WAIT` | duration | `1s` | Minimum backoff between retries. |
+| `INFOBLOX_RETRY_MAX_WAIT` | duration | `30s` | Maximum backoff between retries. |
+
+```bash
+# Override retry settings
+export INFOBLOX_RETRY_ATTEMPTS=5
+export INFOBLOX_RETRY_MIN_WAIT=2s
+export INFOBLOX_RETRY_MAX_WAIT=1m
+
+# Disable retry entirely
+export INFOBLOX_RETRY_ATTEMPTS=0
+```
+
+#### Programmatic Configuration
+
+```go
+// Custom retry settings
+client := uddiclient.NewAPIClient(option.WithRetry(5, 2*time.Second, 1*time.Minute))
+
+// Disable retry entirely
+client := uddiclient.NewAPIClient(option.WithRetryDisabled())
 ```
