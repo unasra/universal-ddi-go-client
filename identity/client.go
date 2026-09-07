@@ -24,16 +24,16 @@ type APIClient struct {
 
 	// API Services
 	AccountOrganizationGroupsAPI AccountOrganizationGroupsAPI
-	AccountsAPI AccountsAPI
-	ApikeysAPI ApikeysAPI
-	CompartmentsAPI CompartmentsAPI
-	CurrentApikeysAPI CurrentApikeysAPI
-	GroupsAPI GroupsAPI
-	ManagedAccountGroupsAPI ManagedAccountGroupsAPI
-	ManagedAccountsAPI ManagedAccountsAPI
-	ProviderAccountGroupsAPI ProviderAccountGroupsAPI
-	SessionsAPI SessionsAPI
-	UsersAPI UsersAPI
+	AccountsAPI                  AccountsAPI
+	ApikeysAPI                   ApikeysAPI
+	CompartmentsAPI              CompartmentsAPI
+	CurrentApikeysAPI            CurrentApikeysAPI
+	GroupsAPI                    GroupsAPI
+	ManagedAccountGroupsAPI      ManagedAccountGroupsAPI
+	ManagedAccountsAPI           ManagedAccountsAPI
+	ProviderAccountGroupsAPI     ProviderAccountGroupsAPI
+	SessionsAPI                  SessionsAPI
+	UsersAPI                     UsersAPI
 }
 
 // NewAPIClient creates a new API client.
