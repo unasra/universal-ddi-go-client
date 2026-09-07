@@ -8,9 +8,11 @@ Name | Type | Description | Notes
 **Cidr** | Pointer to **int64** | The CIDR of the overlapping block. This is required, if _address_ does not specify it in its input. | [optional] 
 **Comment** | Pointer to **string** | The description for the overlapping block. May contain 0 to 1024 characters. Can include UTF-8. | [optional] 
 **CreatedAt** | Pointer to **time.Time** | Time when the object has been created. | [optional] [readonly] 
+**FederatedPoolId** | Pointer to **string** | The resource identifier. | [optional] 
 **FederatedRealm** | **string** | The resource identifier. | 
 **Id** | Pointer to **string** | The resource identifier. | [optional] [readonly] 
 **Name** | Pointer to **string** | The name of the overlapping block. May contain 1 to 256 characters. Can include UTF-8. | [optional] 
+**NetworkCompliant** | Pointer to **bool** | The compliance status of the overlapping block, as determined by the federation service. | [optional] [readonly] 
 **Parent** | Pointer to **string** | The resource identifier. | [optional] 
 **Protocol** | Pointer to **string** | The type of protocol of overlapping block (_ip4_ or _ip6_). | [optional] [readonly] 
 **Tags** | Pointer to **map[string]interface{}** | The tags for the overlapping block in JSON format. | [optional] 
@@ -130,6 +132,31 @@ SetCreatedAt sets CreatedAt field to given value.
 
 HasCreatedAt returns a boolean if a field has been set.
 
+### GetFederatedPoolId
+
+`func (o *OverlappingBlock) GetFederatedPoolId() string`
+
+GetFederatedPoolId returns the FederatedPoolId field if non-nil, zero value otherwise.
+
+### GetFederatedPoolIdOk
+
+`func (o *OverlappingBlock) GetFederatedPoolIdOk() (*string, bool)`
+
+GetFederatedPoolIdOk returns a tuple with the FederatedPoolId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFederatedPoolId
+
+`func (o *OverlappingBlock) SetFederatedPoolId(v string)`
+
+SetFederatedPoolId sets FederatedPoolId field to given value.
+
+### HasFederatedPoolId
+
+`func (o *OverlappingBlock) HasFederatedPoolId() bool`
+
+HasFederatedPoolId returns a boolean if a field has been set.
+
 ### GetFederatedRealm
 
 `func (o *OverlappingBlock) GetFederatedRealm() string`
@@ -199,6 +226,31 @@ SetName sets Name field to given value.
 `func (o *OverlappingBlock) HasName() bool`
 
 HasName returns a boolean if a field has been set.
+
+### GetNetworkCompliant
+
+`func (o *OverlappingBlock) GetNetworkCompliant() bool`
+
+GetNetworkCompliant returns the NetworkCompliant field if non-nil, zero value otherwise.
+
+### GetNetworkCompliantOk
+
+`func (o *OverlappingBlock) GetNetworkCompliantOk() (*bool, bool)`
+
+GetNetworkCompliantOk returns a tuple with the NetworkCompliant field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNetworkCompliant
+
+`func (o *OverlappingBlock) SetNetworkCompliant(v bool)`
+
+SetNetworkCompliant sets NetworkCompliant field to given value.
+
+### HasNetworkCompliant
+
+`func (o *OverlappingBlock) HasNetworkCompliant() bool`
+
+HasNetworkCompliant returns a boolean if a field has been set.
 
 ### GetParent
 

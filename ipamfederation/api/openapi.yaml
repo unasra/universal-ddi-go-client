@@ -10,6 +10,385 @@ servers:
 security:
 - ApiKeyAuth: []
 paths:
+  /federation/aws/scope/management:
+    post:
+      description: Enable or disable external management of an AWS IPAM scope by updating
+        the federated realm's metadata to reflect the desired management mode
+      operationId: aws_scope_managementScopeManagement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationScopeManagementObject'
+        description: Scope management configuration details
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationScopeManagementResponse'
+          description: POST operation response
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Bad Request - Invalid request parameters (e.g., malformed\
+            \ scope ARN, missing required fields)"
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Unauthorized - Invalid or missing authentication token
+        "404":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Not Found - AWS IPAM scope not found or does not exist
+        "500":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Internal Server Error - An unexpected error occurred while
+            setting scope management
+      summary: Configure management settings for AWS IPAM scopes
+      tags:
+      - aws_scope_management
+      x-codegen-request-body-name: body
+  /federation/aws/scope/token:
+    post:
+      description: Generate a time-limited JWT token for authenticating requests to
+        the specified AWS IPAM scope
+      operationId: aws_scope_tokenGenerateToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationManageScopeTokenRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationManageScopeTokenResponse'
+          description: POST operation response
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Invalid request parameters (e.g., malformed scope ARN, invalid\
+            \ expiration, missing required fields)"
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Unauthorized access (e.g., invalid account ID, disabled account)"
+        "403":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Access denied to the specified AWS IPAM scope
+        "404":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: AWS IPAM scope or Infoblox account ID not found
+        "500":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Internal server error occurred while generating token
+      summary: Generate AWS IPAM scope authentication token
+      tags:
+      - aws_scope_token
+      x-codegen-request-body-name: body
+  /federation/create_next_available_fld:
+    post:
+      description: |-
+        Use this method to create the next "n" available __ForwardLookingDelegation__ objects considering the parameter passed.
+        The response will be "n" __ForwardLookingDelegation__ objects.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: next_available_fldCreateNextAvailableFLDBlocks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationNextAvailableFLDRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationNextAvailableFLDResponse'
+          description: POST operation response
+      summary: Create the next available __ForwardLookingDelegation__ objects.
+      tags:
+      - next_available_fld
+      x-codegen-request-body-name: body
+  /federation/delegation:
+    delete:
+      description: "This method has no-operation, but is provided for client IPAM\
+        \ services performing a DELETE of zero Delegations that did not detect the\
+        \ empty request."
+      operationId: delegationDeleteWithoutId
+      responses:
+        "200":
+          content: {}
+          description: OK
+      summary: No-op DELETE Delegation operation.
+      tags:
+      - delegation
+    get:
+      description: |-
+        Use this method to retrieve __Delegation__ objects.
+        The __Delegation__ explicitly marks authority for an address range assigned to another IPAM service.
+      operationId: delegationList
+      parameters:
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be filtered by a\
+          \ logical expression string that includes JSON tag references to values\
+          \ in each resource, literal values, and logical operators. If a resource\
+          \ does not have the specified tag, its value is assumed to be null.\n\n\
+          Literal values include numbers (integer and floating-point), and quoted\
+          \ (both single- or double-quoted) literal strings, and 'null'. The following\
+          \ operators are commonly used in filter expressions:\n\n|  Op   |  Description\
+          \               | \n|  --   |  -----------               | \n|  ==   | \
+          \ Equal                     | \n|  !=   |  Not Equal                 | \n\
+          |  >    |  Greater Than              | \n|   >=  |  Greater Than or Equal\
+          \ To  | \n|  <    |  Less Than                 | \n|  <=   |  Less Than\
+          \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
+          \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
+          \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
+        in: query
+        name: _filter
+        schema:
+          type: string
+      - description: "\n\nThe integer index (zero-origin) of the offset into a collection\
+          \ of resources. If omitted or null the value is assumed to be '0'.\n\n\t\
+          \t\t\t\t\t\t"
+        in: query
+        name: _offset
+        schema:
+          type: integer
+      - description: "\n\nThe integer number of resources to be returned in the response.\
+          \ The service may impose maximum value. If omitted the service may impose\
+          \ a default value.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _limit
+        schema:
+          type: integer
+      - description: "\n\nThe service-defined string used to identify a page of resources.\
+          \ A null value indicates the first page.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _page_token
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be sorted by their\
+          \ JSON tags. For a 'flat' resource, the tag name is straightforward. If\
+          \ sorting is allowed on non-flat hierarchical resources, the service should\
+          \ implement a qualified naming scheme such as dot-qualification to reference\
+          \ data down the hierarchy. If a resource does not have the specified tag,\
+          \ its value is assumed to be null.)\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names. The sort direction can be specified by a suffix\
+          \ separated by whitespace before the tag name. The suffix 'asc' sorts the\
+          \ data in ascending order. The suffix 'desc' sorts the data in descending\
+          \ order. If no suffix is specified the data is sorted in ascending order.\n\
+          \n\t\t\t\t\t\t"
+        in: query
+        name: _order_by
+        schema:
+          type: string
+      - description: This parameter is used for sorting by tags.
+        in: query
+        name: _torder_by
+        schema:
+          type: string
+      - description: This parameter is used for filtering by tags.
+        in: query
+        name: _tfilter
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationListDelegationResponse'
+          description: GET operation response
+      summary: Retrieve the delegation.
+      tags:
+      - delegation
+    post:
+      description: |-
+        Use this method to create a __Delegation__ object.
+        The __Delegation__ explicitly marks authority for an address range assigned to another IPAM service.
+      operationId: delegationCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationDelegation'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationCreateDelegationResponse'
+          description: POST operation response
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Invalid request parameters (e.g., missing required fields,\
+            \ missing required prerequisites, invalid address format, invalid CIDR\
+            \ values)"
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Unauthorized access (e.g., invalid or missing authentication\
+            \ token)"
+        "403":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Forbidden operation (e.g., insufficient permissions to create\
+            \ delegation in the specified realm)"
+        "404":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Resource not found (e.g., specified federated realm, parent\
+            \ block, or federated pool does not exist)"
+        "409":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Conflict error (e.g., delegation already exists, address space\
+            \ conflicts with existing allocations)"
+        "500":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Internal server error (e.g., database connection issues, unexpected\
+            \ system failures)"
+      summary: Create the delegation.
+      tags:
+      - delegation
+      x-codegen-request-body-name: body
+  /federation/delegation/{id}:
+    delete:
+      description: |-
+        Use this method to delete a __Delegation__ object.
+        The __Delegation__ explicitly marks authority for an address range assigned to another IPAM service.
+      operationId: delegationDelete
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+      summary: Delete the delegation.
+      tags:
+      - delegation
+    get:
+      description: |-
+        Use this method to retrieve a __Delegation__ object.
+        The __Delegation__ explicitly marks authority for an address range assigned to another IPAM service.
+      operationId: delegationRead
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationReadDelegationResponse'
+          description: GET operation response
+      summary: Retrieve the delegation.
+      tags:
+      - delegation
+    patch:
+      description: |-
+        Use this method to update a __Delegation__ object.
+        The __Delegation__ explicitly marks authority for an address range assigned to another IPAM service.
+      operationId: delegationUpdate
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationDelegation'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationUpdateDelegationResponse'
+          description: PATCH operation response
+      summary: Update the delegation.
+      tags:
+      - delegation
+      x-codegen-request-body-name: body
   /federation/federated_block:
     get:
       description: |-
@@ -43,7 +422,7 @@ paths:
           \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
           \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
           \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
-          \           | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t"
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
         in: query
         name: _filter
         schema:
@@ -212,11 +591,40 @@ paths:
       - federated_block
       x-sdk-default-tags: true
       x-codegen-request-body-name: body
+  /federation/federated_block/{id}/create_next_available_fld:
+    post:
+      operationId: next_available_fldCreateNextAvailableFLD
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationCreateNextAvailableFLDRequestForBlock'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationNextAvailableFLDResponse'
+          description: POST operation response
+      summary: |-
+        Create the next available __ForwardLookingDelegation__ objects within a specific __FederatedBlock__.
+        Use this method to create the next available __ForwardLookingDelegation__ objects under the specified parent __FederatedBlock__.
+      tags:
+      - next_available_fld
+      x-codegen-request-body-name: body
   /federation/federated_block/{id}/next_available_federated_block:
     get:
       description: |-
-        Use this method to generate the next "n" available __FederatedBlock__ object with user specified predicates.
-        The response will be "n" __FederatedBlock__ objects.
+        Use this method to retrieve the next available __FederatedBlock__ objects.
+        This returns one or more __FederatedBlock__ objects from the specified parent __FederatedBlock__ block.
       operationId: next_available_federated_blockListNextAvailableFederatedBlocks
       parameters:
       - description: An application specific resource identity of a resource
@@ -262,8 +670,8 @@ paths:
       - next_available_federated_block
     post:
       description: |-
-        Use this method to generate the next "n" available __FederatedBlock__ object with user specified predicates.
-        The response will be "n" __FederatedBlock__ objects.
+        Use this method to allocate the next available __FederatedBlock__ objects.
+        This allocates one or more __FederatedBlock__ objects from the specified parent __FederatedBlock__ block.
       operationId: next_available_federated_blockCreateNextAvailableFederatedBlocks
       parameters:
       - description: An application specific resource identity of a resource
@@ -293,8 +701,8 @@ paths:
   /federation/federated_block/{id}/next_available_overlapping_block:
     get:
       description: |-
-        Use this method to list the next "n" available __OverlappingBlock__ object with user specified predicates.
-        The response will be "n" __OverlappingBlock__ objects.
+        Use this method to retrieve the next available __OverlappingBlock__ objects.
+        This returns one or more __OverlappingBlock__ objects from the specified parent __FederatedBlock__ block.
       operationId: next_available_overlapping_blockListNextAvailableOverlappingBlocks
       parameters:
       - description: An application specific resource identity of a resource
@@ -340,8 +748,8 @@ paths:
       - next_available_overlapping_block
     post:
       description: |-
-        Use this method to generate the next "n" available __OverlappingBlock__ object with user specified predicates.
-        The response will be "n" __OverlappingBlock__ objects.
+        Use this method to allocate the next available __OverlappingBlock__ objects.
+        This allocates one or more __OverlappingBlock__ objects from the specified parent __FederatedBlock__ block.
       operationId: next_available_federated_blockCreateNextAvailableOverlappingBlocks
       parameters:
       - description: An application specific resource identity of a resource
@@ -371,8 +779,8 @@ paths:
   /federation/federated_block/{id}/next_available_reserved_block:
     get:
       description: |-
-        Use this method to list the next "n" available __ReservedBlock__ object with user specified predicates.
-        The response will be "n" __ReservedBlock__ objects.
+        Use this method to retrieve the next available __ReservedBlock__ objects.
+        This returns one or more __ReservedBlock__ objects from the specified parent __FederatedBlock__ block.
       operationId: next_available_reserved_blockListNextAvailableReservedBlocks
       parameters:
       - description: An application specific resource identity of a resource
@@ -418,9 +826,9 @@ paths:
       - next_available_reserved_block
     post:
       description: |-
-        Use this method to generate the next "n" available __ReservedBlock__ object with user specified predicates.
-        The response will be "n" __ReservedBlock__ objects.
-      operationId: next_available_federated_blockCreateNextAvailableReservedBlocks
+        Use this method to allocate the next available __ReservedBlock__ objects.
+        This allocates one or more __ReservedBlock__ objects from the specified parent __FederatedBlock__ block.
+      operationId: next_available_reserved_blockCreateNextAvailableReservedBlocks
       parameters:
       - description: An application specific resource identity of a resource
         in: path
@@ -443,8 +851,269 @@ paths:
           description: POST operation response
       summary: Retrieve the next available reserved block.
       tags:
-      - next_available_federated_block
+      - next_available_reserved_block
       x-sdk-default-tags: true
+      x-codegen-request-body-name: body
+  /federation/federated_pool:
+    get:
+      description: |-
+        Use this method to retrieve __FederatedPool__ objects.
+        The __FederatedPool__ object represents a group of federated blocks that can be allocated for specific providers and regions.
+      operationId: federated_poolList
+      parameters:
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be filtered by a\
+          \ logical expression string that includes JSON tag references to values\
+          \ in each resource, literal values, and logical operators. If a resource\
+          \ does not have the specified tag, its value is assumed to be null.\n\n\
+          Literal values include numbers (integer and floating-point), and quoted\
+          \ (both single- or double-quoted) literal strings, and 'null'. The following\
+          \ operators are commonly used in filter expressions:\n\n|  Op   |  Description\
+          \               | \n|  --   |  -----------               | \n|  ==   | \
+          \ Equal                     | \n|  !=   |  Not Equal                 | \n\
+          |  >    |  Greater Than              | \n|   >=  |  Greater Than or Equal\
+          \ To  | \n|  <    |  Less Than                 | \n|  <=   |  Less Than\
+          \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
+          \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
+          \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
+        in: query
+        name: _filter
+        schema:
+          type: string
+      - description: "\n\nThe integer index (zero-origin) of the offset into a collection\
+          \ of resources. If omitted or null the value is assumed to be '0'.\n\n\t\
+          \t\t\t\t\t\t"
+        in: query
+        name: _offset
+        schema:
+          type: integer
+      - description: "\n\nThe integer number of resources to be returned in the response.\
+          \ The service may impose maximum value. If omitted the service may impose\
+          \ a default value.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _limit
+        schema:
+          type: integer
+      - description: "\n\nThe service-defined string used to identify a page of resources.\
+          \ A null value indicates the first page.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _page_token
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be sorted by their\
+          \ JSON tags. For a 'flat' resource, the tag name is straightforward. If\
+          \ sorting is allowed on non-flat hierarchical resources, the service should\
+          \ implement a qualified naming scheme such as dot-qualification to reference\
+          \ data down the hierarchy. If a resource does not have the specified tag,\
+          \ its value is assumed to be null.)\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names. The sort direction can be specified by a suffix\
+          \ separated by whitespace before the tag name. The suffix 'asc' sorts the\
+          \ data in ascending order. The suffix 'desc' sorts the data in descending\
+          \ order. If no suffix is specified the data is sorted in ascending order.\n\
+          \n\t\t\t\t\t\t"
+        in: query
+        name: _order_by
+        schema:
+          type: string
+      - description: This parameter is used for sorting by tags.
+        in: query
+        name: _torder_by
+        schema:
+          type: string
+      - description: This parameter is used for filtering by tags.
+        in: query
+        name: _tfilter
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationListFederatedPoolResponse'
+          description: GET operation response
+      summary: Retrieve federated pools.
+      tags:
+      - federated_pool
+    post:
+      description: |-
+        Use this method to create a __FederatedPool__ object.
+        The __FederatedPool__ object represents a group of federated blocks that can be allocated for specific providers and regions..
+      operationId: federated_poolCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationFederatedPool'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationCreateFederatedPoolResponse'
+          description: POST operation response
+      summary: Create the federated pool.
+      tags:
+      - federated_pool
+      x-codegen-request-body-name: body
+  /federation/federated_pool/{id}:
+    delete:
+      description: |-
+        Use this method to delete a __FederatedPool__ object.
+        The __FederatedPool__ object represents a group of federated blocks that can be allocated for specific providers and regions.
+      operationId: federated_poolDelete
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+      summary: Delete the federated pool.
+      tags:
+      - federated_pool
+    get:
+      description: |-
+        Use this method to retrieve a __FederatedPool__ object.
+        The __FederatedPool__ object represents a group of federated blocks that can be allocated for specific providers and regions.
+      operationId: federated_poolRead
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationReadFederatedPoolResponse'
+          description: GET operation response
+      summary: Retrieve the federated pool.
+      tags:
+      - federated_pool
+    patch:
+      description: |-
+        Use this method to update a __FederatedPool__ object.
+        The __FederatedPool__ object represents a group of federated blocks that can be allocated for specific providers and regions.
+      operationId: federated_poolUpdate
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationFederatedPool'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationUpdateFederatedPoolResponse'
+          description: PATCH operation response
+      summary: Update the federated pool.
+      tags:
+      - federated_pool
+      x-codegen-request-body-name: body
+  /federation/federated_pool/{id}/create_next_available_fld:
+    post:
+      description: |-
+        Use this method to allocate the next available __ForwardLookingDelegation__ objects within a specific federated pool.
+        Federated blocks within the pool are evaluated in ascending CIDR order (largest address space first).
+        Returns the allocated __ForwardLookingDelegation__ objects.
+      operationId: next_available_fldCreateNextAvailableFLDForPool
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationNextAvailableFLDPoolRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationNextAvailableFLDResponse'
+          description: POST operation response
+      summary: Create the next available __ForwardLookingDelegation__ objects within
+        a pool.
+      tags:
+      - next_available_fld
+      x-codegen-request-body-name: body
+  /federation/federated_pool/{id}/next_available_federated_block:
+    post:
+      description: |-
+        Use this method to allocate the next available __FederatedBlock__ objects within a specific federated pool.
+        This allocates one or more __FederatedBlock__ objects from the specified federated pool.
+        This is a thin wrapper that reuses the block-level NAB logic by finding suitable parent blocks in the pool.
+      operationId: next_available_pool_blockCreateNextAvailableBlocks
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationNextAvailableBlockRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationCreateNextAvailableFederatedBlockResponse'
+          description: POST operation response
+      summary: Create the next available federated blocks within a pool.
+      tags:
+      - next_available_pool_block
       x-codegen-request-body-name: body
   /federation/federated_realm:
     get:
@@ -467,7 +1136,7 @@ paths:
           \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
           \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
           \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
-          \           | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t"
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
         in: query
         name: _filter
         schema:
@@ -646,6 +1315,310 @@ paths:
       - federated_realm
       x-sdk-default-tags: true
       x-codegen-request-body-name: body
+  /federation/forward_looking_delegation:
+    get:
+      description: |-
+        Use this method to retrieve __ForwardLookingDelegation__ objects.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: forward_looking_delegationList
+      parameters:
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be filtered by a\
+          \ logical expression string that includes JSON tag references to values\
+          \ in each resource, literal values, and logical operators. If a resource\
+          \ does not have the specified tag, its value is assumed to be null.\n\n\
+          Literal values include numbers (integer and floating-point), and quoted\
+          \ (both single- or double-quoted) literal strings, and 'null'. The following\
+          \ operators are commonly used in filter expressions:\n\n|  Op   |  Description\
+          \               | \n|  --   |  -----------               | \n|  ==   | \
+          \ Equal                     | \n|  !=   |  Not Equal                 | \n\
+          |  >    |  Greater Than              | \n|   >=  |  Greater Than or Equal\
+          \ To  | \n|  <    |  Less Than                 | \n|  <=   |  Less Than\
+          \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
+          \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
+          \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
+        in: query
+        name: _filter
+        schema:
+          type: string
+      - description: "\n\nThe integer index (zero-origin) of the offset into a collection\
+          \ of resources. If omitted or null the value is assumed to be '0'.\n\n\t\
+          \t\t\t\t\t\t"
+        in: query
+        name: _offset
+        schema:
+          type: integer
+      - description: "\n\nThe integer number of resources to be returned in the response.\
+          \ The service may impose maximum value. If omitted the service may impose\
+          \ a default value.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _limit
+        schema:
+          type: integer
+      - description: "\n\nThe service-defined string used to identify a page of resources.\
+          \ A null value indicates the first page.\n\n\t\t\t\t\t\t\t"
+        in: query
+        name: _page_token
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be sorted by their\
+          \ JSON tags. For a 'flat' resource, the tag name is straightforward. If\
+          \ sorting is allowed on non-flat hierarchical resources, the service should\
+          \ implement a qualified naming scheme such as dot-qualification to reference\
+          \ data down the hierarchy. If a resource does not have the specified tag,\
+          \ its value is assumed to be null.)\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names. The sort direction can be specified by a suffix\
+          \ separated by whitespace before the tag name. The suffix 'asc' sorts the\
+          \ data in ascending order. The suffix 'desc' sorts the data in descending\
+          \ order. If no suffix is specified the data is sorted in ascending order.\n\
+          \n\t\t\t\t\t\t"
+        in: query
+        name: _order_by
+        schema:
+          type: string
+      - description: This parameter is used for sorting by tags.
+        in: query
+        name: _torder_by
+        schema:
+          type: string
+      - description: This parameter is used for filtering by tags.
+        in: query
+        name: _tfilter
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationListForwardLookingDelegationResponse'
+          description: GET operation response
+      summary: Retrieve the __ForwardLookingDelegation__ objects.
+      tags:
+      - forward_looking_delegation
+    post:
+      description: |-
+        Use this method to create __ForwardLookingDelegation__ object with the parameter passed.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: forward_looking_delegationCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationForwardLookingDelegation'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationCreateForwardLookingDelegationResponse'
+          description: POST operation response
+      summary: Create the __ForwardLookingDelegation__ object.
+      tags:
+      - forward_looking_delegation
+      x-codegen-request-body-name: body
+  /federation/forward_looking_delegation/{id}:
+    delete:
+      description: |-
+        Use this method to delete a __ForwardLookingDelegation__ object.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: forward_looking_delegationDelete
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+      summary: Delete a specific __ForwardLookingDelegation__ object.
+      tags:
+      - forward_looking_delegation
+    get:
+      description: |-
+        Use this method to retrieve a __ForwardLookingDelegation__ object.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: forward_looking_delegationRead
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: "\n\nA collection of response resources can be transformed by\
+          \ specifying a set of JSON tags to be returned. For a “flat” resource, the\
+          \ tag name is straightforward. If field selection is allowed on non-flat\
+          \ hierarchical resources, the service should implement a qualified naming\
+          \ scheme such as dot-qualification to reference data down the hierarchy.\
+          \ If a resource does not have the specified tag, the tag does not appear\
+          \ in the output resource.\n\nSpecify this parameter as a comma-separated\
+          \ list of JSON tag names.\n\n\t\t\t\t\t\t"
+        in: query
+        name: _fields
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationReadForwardLookingDelegationResponse'
+          description: GET operation response
+      summary: Retrieve the __ForwardLookingDelegation__ object.
+      tags:
+      - forward_looking_delegation
+    patch:
+      description: |-
+        Use this method to update __ForwardLookingDelegation__ object with the parameter passed.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: forward_looking_delegationUpdate
+      parameters:
+      - description: An application specific resource identity of a resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationForwardLookingDelegation'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationUpdateForwardLookingDelegationResponse'
+          description: PATCH operation response
+      summary: Update the __ForwardLookingDelegation__ object.
+      tags:
+      - forward_looking_delegation
+      x-codegen-request-body-name: body
+  /federation/list_next_available_fld:
+    get:
+      description: |-
+        Use this method to get the next "n" available __ForwardLookingDelegation__ objects which can be created considering
+        the parameter passed. The response will be "n" __ForwardLookingDelegation__ objects.
+        A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_) is a set of contiguous IP addresses with no gap, expressed as a CIDR block. Forward Looking Delegations may be used to allocate unique space for future resources which will ultimately hold a Delegation for the same CIDR block.
+      operationId: next_available_fld_blockListNextAvailableFLDBlocks
+      parameters:
+      - description: The CIDR of the __ForwardLookingDelegation__. This is required.
+        in: query
+        name: cidr
+        schema:
+          format: int64
+          type: integer
+      - description: "The count of __ForwardLookingDelegation__ required. If not provided,\
+          \ it will default to 1."
+        in: query
+        name: count
+        schema:
+          format: int64
+          type: integer
+      - description: The name to be provided.
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: The description for the __ForwardLookingDelegation__. May contain
+          0 to 1024 characters. Can include UTF-8.
+        in: query
+        name: comment
+        schema:
+          type: string
+      - description: The version of the address (_ip4_ or _ip6_). If not present then
+          it will default to _ip4_.
+        in: query
+        name: protocol
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationNextAvailableFLDResponse'
+          description: GET operation response
+      summary: List the next available __ForwardLookingDelegation__ objects.
+      tags:
+      - next_available_fld_block
+  /federation/next_appropriate_delegation:
+    post:
+      description: Creates next appropriate __Delegation__ objects based on the provided
+        payload. This method is used to generate a __Delegation__ that fits the specified
+        criteria.
+      operationId: next_appropriate_delegationCreateNextAppropriateDelegation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/federationNextAppropriateDelegation'
+        description: The __NextAppropriateDelegation__ object.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federationNextAppropriateDelegationResponse'
+          description: POST operation response
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Invalid request parameters (e.g., missing required fields,\
+            \ missing required prerequisites, invalid address format, invalid CIDR\
+            \ values)"
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "Unauthorized access (e.g., invalid token)"
+        "404":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: The resource referred to by 'scope_arn' does not exist or is
+            not found
+        "409":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Not sufficient address space available to allocate for the
+            request.
+        "500":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Internal server error while allocating delegation
+      summary: Create Next Appropriate Delegation
+      tags:
+      - next_appropriate_delegation
+      x-codegen-request-body-name: body
   /federation/overlapping_block:
     get:
       description: |-
@@ -679,7 +1652,7 @@ paths:
           \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
           \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
           \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
-          \           | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t"
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
         in: query
         name: _filter
         schema:
@@ -879,7 +1852,7 @@ paths:
           \ or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |\
           \  Matches Regex             | \n|  !~   |  Does Not Match Regex      |\
           \ \n|  or   |  Logical OR                | \n|  not  |  Logical NOT    \
-          \           | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t"
+          \           | \n|  ()   |  Grouping Operators       |\n\n\t\t\t\t\t\t"
         in: query
         name: _filter
         schema:
@@ -1048,12 +2021,44 @@ paths:
       x-codegen-request-body-name: body
 components:
   schemas:
+    apiPageInfo:
+      description: |-
+        PageInfo represents both server-driven and client-driven pagination response.
+        Server-driven pagination is a model in which the server returns some
+        amount of data along with an token indicating there is more data
+        and where subsequent queries can get the next page of data.
+        Client-driven pagination is a model in which rows are addressable by
+        offset and page size (limit).
+      example:
+        offset: 0
+        size: 6
+        page_token: page_token
+      properties:
+        offset:
+          description: |-
+            The service may optionally include the offset of the next page of resources.
+            A null value indicates no more pages.
+          format: int32
+          type: integer
+        page_token:
+          description: |-
+            The service response should contain a string to indicate
+            the next page of resources.
+            A null value indicates no more pages.
+          type: string
+        size:
+          description: The service may optionally include the total number of resources
+            being paged.
+          format: int32
+          type: integer
+      type: object
     federationAllocation:
       description: The __Allocation__ tracks the distribution of Federated Blocks
         within each of the supported objects.
       example:
+        forward_looking_delegation: 1
         reserved: 5
-        overlapping: 1
+        overlapping: 5
         delegated: 6
         allocated: 0
       properties:
@@ -1064,6 +2069,11 @@ components:
           type: integer
         delegated:
           description: Percent of total space delegated.
+          format: int64
+          readOnly: true
+          type: integer
+        forward_looking_delegation:
+          description: Percent of total space in forward looking delegation blocks.
           format: int64
           readOnly: true
           type: integer
@@ -1079,43 +2089,137 @@ components:
           type: integer
       title: Allocation
       type: object
+    federationCreateDelegationResponse:
+      description: The response format to create the __Delegation__ object.
+      example:
+        result:
+          metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+      properties:
+        result:
+          $ref: '#/components/schemas/federationDelegation'
+      title: CreateDelegationResponse
+      type: object
     federationCreateFederatedBlockResponse:
       description: The response format to create the __FederatedBlock__ object.
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         result:
           $ref: '#/components/schemas/federationFederatedBlock'
       title: CreateFederatedBlockResponse
       type: object
+    federationCreateFederatedPoolResponse:
+      description: The response format to create the __FederatedPool__ object.
+      example:
+        result:
+          parent: parent
+          allocation:
+            forward_looking_delegation: 1
+            reserved: 5
+            overlapping: 5
+            delegated: 6
+            allocated: 0
+          metadata: "{}"
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          utilization: 14
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          id: id
+          state: state
+          region: region
+          network_compliant: true
+      properties:
+        result:
+          $ref: '#/components/schemas/federationFederatedPool'
+      title: CreateFederatedPoolResponse
+      type: object
     federationCreateFederatedRealmResponse:
       description: The response format to create the __FederatedRealm__ object.
       example:
         result:
+          metadata: "{}"
           updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           comment: comment
+          utilization: 0
           id: id
+          region: region
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
           tags: "{}"
@@ -1124,43 +2228,134 @@ components:
           $ref: '#/components/schemas/federationFederatedRealm'
       title: CreateFederatedRealmResponse
       type: object
+    federationCreateForwardLookingDelegationResponse:
+      description: The response format to create the __ForwardLookingDelegation__
+        object.
+      example:
+        result:
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          address: address
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
+          tags: "{}"
+      properties:
+        result:
+          $ref: '#/components/schemas/federationForwardLookingDelegation'
+      title: CreateForwardLookingDelegationResponse
+      type: object
+    federationCreateNextAvailableFLDRequestForBlock:
+      description: Use this request to create the next available __ForwardLookingDelegation__
+        objects within a specific parent __FederatedBlock__.
+      properties:
+        cidr:
+          description: The CIDR of the __ForwardLookingDelegation__. This is required.
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        comment:
+          description: The description for the __ForwardLookingDelegation__. May contain
+            0 to 1024 characters. Can include UTF-8.
+          type: string
+        count:
+          description: "The count of __ForwardLookingDelegation__ required. If not\
+            \ provided, it will default to 1."
+          format: int64
+          type: integer
+        id:
+          description: The resource identifier.
+          readOnly: true
+          type: string
+        name:
+          description: The name to be provided.
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the __ForwardLookingDelegation__ in JSON format.
+          type: object
+      required:
+      - cidr
+      - id
+      title: ForwardLookingDelegationBlockRequest
+      type: object
     federationCreateNextAvailableFederatedBlockResponse:
       description: The response format to allocate next available __FederatedBlock__
         objects.
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         results:
           items:
@@ -1174,27 +2369,31 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
       properties:
         results:
           items:
@@ -1208,27 +2407,35 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         results:
           items:
@@ -1241,16 +2448,18 @@ components:
       example:
         result:
           parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationOverlappingBlock'
@@ -1261,20 +2470,133 @@ components:
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationReservedBlock'
       title: CreateReservedBlockResponse
+      type: object
+    federationDelegation:
+      description: "A __Delegation__ object (_federation/delegation_) is a set of\
+        \ contiguous IP addresses with no gap, expressed as a CIDR block. A Delegation\
+        \ is explicitly associated with Federated Realms, and implicitly with Federated\
+        \ Block Parents. A Delegation in a given realm is said to be the child of\
+        \ the closest enclosing parent."
+      example:
+        metadata: "{}"
+        address: address
+        federated_realms:
+        - federated_realms
+        - federated_realms
+        created_at: 2000-01-23T04:56:07.000+00:00
+        utilization: 60
+        tags: "{}"
+        federated_pool_id: federated_pool_id
+        protocol: protocol
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        name: name
+        cidr: 11
+        comment: comment
+        delegated_to: delegated_to
+        id: id
+        region: region
+        parents:
+        - parents
+        - parents
+      properties:
+        address:
+          description: "The address field in form “a.b.c.d/n” where the “/n” may be\
+            \ omitted. In this case, the CIDR value must be defined in the _cidr_\
+            \ field. When reading, the _address_ field is always in the form “a.b.c.d”\
+            ."
+          type: string
+        cidr:
+          description: "The CIDR of the delegation. This is required, if _address_\
+            \ does not specify it in its input."
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        comment:
+          description: The description for the delegation. May contain 0 to 1024 characters.
+            Can include UTF-8.
+          type: string
+        created_at:
+          description: Time when the object has been created.
+          format: date-time
+          readOnly: true
+          type: string
+        delegated_to:
+          description: "The specific IPAM service the delegation was delegated to.\
+            \ In case federated realms are not provided, this field would be used\
+            \ to determine the __Federated_Realm__ the __Delegation__ should be part\
+            \ of."
+          type: string
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
+        federated_realms:
+          description: The resource identifier.
+          items:
+            type: string
+          type: array
+        id:
+          description: The resource identifier.
+          readOnly: true
+          type: string
+        metadata:
+          additionalProperties: false
+          description: The metadata for the delegation in JSON format.
+          type: object
+        name:
+          description: The name of the delegation. May contain 1 to 256 characters.
+            Can include UTF-8.
+          type: string
+        parents:
+          description: The resource identifier.
+          items:
+            type: string
+          type: array
+        protocol:
+          description: The type of protocol of delegation (_ip4_ or _ip6_).
+          readOnly: true
+          type: string
+        region:
+          description: The region where the delegation is located.
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the delegation in JSON format.
+          type: object
+        updated_at:
+          description: Time when the object has been updated. Equals to _created_at_
+            if not updated after creation.
+          format: date-time
+          readOnly: true
+          type: string
+        utilization:
+          description: The IP address utilization percentage of the object _federation/delegation_.
+          format: int64
+          maximum: 100
+          readOnly: true
+          type: integer
+      required:
+      - address
+      - delegated_to
+      title: Delegation
       type: object
     federationFederatedBlock:
       description: "A __FederatedBlock__ object (_federation/federated_block_) is\
@@ -1284,21 +2606,37 @@ components:
         \ overlaps. Top level federated blocks are parented to a federated realm."
       example:
         parent: parent
-        protocol: protocol
+        metadata: "{}"
         address: address
         federated_realm: federated_realm
-        updated_at: 2000-01-23T04:56:07.000+00:00
-        name: name
         created_at: 2000-01-23T04:56:07.000+00:00
-        cidr: 72
+        utilization: 2
+        utilization_v6:
+          total:
+            raw_value: raw_value
+          used:
+            raw_value: raw_value
+        tags: "{}"
+        federated_pool_id: federated_pool_id
+        protocol: protocol
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        network_compliance:
+          minimum_netmask_length: 3
+          default_netmask_length: 7
+          maximum_netmask_length: 9
+        name: name
+        cidr: 30
         comment: comment
         id: id
+        state: state
+        region: region
+        network_compliant: true
         allocation_v4:
+          forward_looking_delegation: 1
           reserved: 5
-          overlapping: 1
+          overlapping: 5
           delegated: 6
           allocated: 0
-        tags: "{}"
       properties:
         address:
           description: "The address field in form “a.b.c.d/n” where the “/n” may be\
@@ -1324,6 +2662,9 @@ components:
           format: date-time
           readOnly: true
           type: string
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
         federated_realm:
           description: The resource identifier.
           type: string
@@ -1331,16 +2672,36 @@ components:
           description: The resource identifier.
           readOnly: true
           type: string
+        metadata:
+          additionalProperties: false
+          description: The metadata for the federated block in JSON format.
+          type: object
         name:
           description: The name of the federated block. May contain 1 to 256 characters.
             Can include UTF-8.
           type: string
+        network_compliance:
+          $ref: '#/components/schemas/federationNetworkCompliance'
+        network_compliant:
+          description: "Indicates if this block is compliant with its parent's network\
+            \ compliance policy. When false, a trouble dot should be displayed in\
+            \ the UI to indicate non-compliance."
+          format: boolean
+          readOnly: true
+          type: boolean
         parent:
           description: The resource identifier.
           type: string
         protocol:
           description: The type of protocol of federated block (_ip4_ or _ip6_).
           readOnly: true
+          type: string
+        region:
+          description: The region where the federated block is located.
+          type: string
+        state:
+          title: "The current state of the federated block (e.g., 'active', 'pending',\
+            \ etc.)"
           type: string
         tags:
           additionalProperties: false
@@ -1352,22 +2713,154 @@ components:
           format: date-time
           readOnly: true
           type: string
+        utilization:
+          description: The percentage of Federated Block utilization.
+          format: int64
+          type: integer
+        utilization_v6:
+          $ref: '#/components/schemas/federationUtilizationV6'
       required:
+      - address
       - federated_realm
       title: FederatedBlock
+      type: object
+    federationFederatedPool:
+      description: A __FederatedPool__ object (_federation/federated_pool_) represents
+        a group of federated blocks that can be allocated for specific providers and
+        regions. Federated pools are hierarchical and may be parented to other federated
+        pools. Top level federated pools are parented to a federated realm.
+      example:
+        parent: parent
+        allocation:
+          forward_looking_delegation: 1
+          reserved: 5
+          overlapping: 5
+          delegated: 6
+          allocated: 0
+        metadata: "{}"
+        federated_realm: federated_realm
+        created_at: 2000-01-23T04:56:07.000+00:00
+        description: description
+        utilization: 14
+        utilization_v6:
+          total:
+            raw_value: raw_value
+          used:
+            raw_value: raw_value
+        tags: "{}"
+        protocol: protocol
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        provider: null
+        network_compliance:
+          minimum_netmask_length: 3
+          default_netmask_length: 7
+          maximum_netmask_length: 9
+        name: name
+        id: id
+        state: state
+        region: region
+        network_compliant: true
+      properties:
+        allocation:
+          $ref: '#/components/schemas/federationAllocation'
+        created_at:
+          description: Time when the object has been created.
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          description: The description for the federated pool. May contain 0 to 1024
+            characters. Can include UTF-8.
+          type: string
+        federated_realm:
+          description: The resource identifier.
+          type: string
+        id:
+          description: The resource identifier.
+          readOnly: true
+          type: string
+        metadata:
+          additionalProperties: false
+          description: The metadata for the federated pool in JSON format.
+          type: object
+        name:
+          description: The name of the federated pool. May contain 1 to 256 characters.
+            Can include UTF-8.
+          type: string
+        network_compliance:
+          $ref: '#/components/schemas/federationNetworkCompliance'
+        network_compliant:
+          description: "Indicates if this pool is compliant with its parent's network\
+            \ compliance policy. When false, a trouble dot should be displayed in\
+            \ the UI to indicate non-compliance."
+          format: boolean
+          readOnly: true
+          type: boolean
+        parent:
+          description: The resource identifier.
+          type: string
+        protocol:
+          description: "The address family of the pool ('ip4', 'ip6', or 'ip4/ip6'\
+            \ for dual mode support on NIOS_X pools only)."
+          type: string
+        provider:
+          $ref: '#/components/schemas/federationProviderType'
+        region:
+          description: "The region/locale this pool is associated with (e.g., 'us-west-1',\
+            \ 'eu-central-1')."
+          type: string
+        state:
+          description: "The current state of the federated pool (e.g., 'create-complete',\
+            \ 'create-in-progress', 'delete-in-progress')."
+          readOnly: true
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the federated pool in JSON format.
+          type: object
+        updated_at:
+          description: Time when the object has been updated. Equals to _created_at_
+            if not updated after creation.
+          format: date-time
+          readOnly: true
+          type: string
+        utilization:
+          description: The IPv4 utilization percentage of the __FederatedPool__.
+          format: int64
+          maximum: 100
+          readOnly: true
+          type: integer
+        utilization_v6:
+          $ref: '#/components/schemas/federationUtilizationV6'
+      required:
+      - federated_realm
+      - protocol
+      - provider
+      - region
+      title: FederatedPool
       type: object
     federationFederatedRealm:
       description: A __FederatedRealm__ object is a unique set of federated blocks
         per realm.
       example:
+        metadata: "{}"
         updated_at: 2000-01-23T04:56:07.000+00:00
+        provider: null
         name: name
         created_at: 2000-01-23T04:56:07.000+00:00
         comment: comment
+        utilization: 0
         id: id
+        region: region
+        utilization_v6:
+          total:
+            raw_value: raw_value
+          used:
+            raw_value: raw_value
         allocation_v4:
+          forward_looking_delegation: 1
           reserved: 5
-          overlapping: 1
+          overlapping: 5
           delegated: 6
           allocated: 0
         tags: "{}"
@@ -1387,9 +2880,18 @@ components:
           description: The resource identifier.
           readOnly: true
           type: string
+        metadata:
+          additionalProperties: false
+          description: The metadata for the federated realm in JSON format.
+          type: object
         name:
           description: The name of the federated realm. May contain 1 to 256 characters;
             can include UTF-8.
+          type: string
+        provider:
+          $ref: '#/components/schemas/federationProviderType'
+        region:
+          description: The region where the realm is located.
           type: string
         tags:
           additionalProperties: false
@@ -1401,46 +2903,229 @@ components:
           format: date-time
           readOnly: true
           type: string
+        utilization:
+          description: The percentage of Federated Realm utilization.
+          format: int64
+          type: integer
+        utilization_v6:
+          $ref: '#/components/schemas/federationUtilizationV6'
       required:
       - name
       title: FederatedRealm
+      type: object
+    federationForwardLookingDelegation:
+      description: "A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_)\
+        \ is a set of contiguous IP addresses with no gap, expressed as a CIDR block.\
+        \ It may be used to allocate unique space for future resources which will\
+        \ ultimately hold a Delegation for the same CIDR block."
+      example:
+        federated_pool_id: federated_pool_id
+        protocol: protocol
+        address: address
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        federated_realms:
+        - federated_realms
+        - federated_realms
+        name: name
+        created_at: 2000-01-23T04:56:07.000+00:00
+        cidr: 11
+        comment: comment
+        id: id
+        network_compliant: true
+        tags: "{}"
+      properties:
+        address:
+          description: "The address field in form “a.b.c.d/n” where the “/n” may be\
+            \ omitted. In this case, the CIDR value must be defined in the _cidr_\
+            \ field. When reading, the _address_ field is always in the form “a.b.c.d”\
+            ."
+          type: string
+        cidr:
+          description: "The CIDR of the delegation. This is required, if _address_\
+            \ does not specify it in its input."
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        comment:
+          description: The description for the delegation. May contain 0 to 1024 characters.
+            Can include UTF-8.
+          type: string
+        created_at:
+          description: Time when the object has been created.
+          format: date-time
+          readOnly: true
+          type: string
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
+        federated_realms:
+          description: The resource identifier.
+          items:
+            type: string
+          type: array
+        id:
+          description: The resource identifier.
+          readOnly: true
+          type: string
+        name:
+          description: The name of the delegation. May contain 1 to 256 characters.
+            Can include UTF-8.
+          type: string
+        network_compliant:
+          description: "The compliance status of the forward looking delegation, as\
+            \ determined by the federation service."
+          format: boolean
+          readOnly: true
+          type: boolean
+        protocol:
+          description: The type of protocol of delegation (_ip4_ or _ip6_).
+          readOnly: true
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the delegation in JSON format.
+          type: object
+        updated_at:
+          description: Time when the object has been updated. Equals to _created_at_
+            if not updated after creation.
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - address
+      - federated_realms
+      title: ForwardLookingDelegation
+      type: object
+    federationInteger128:
+      example:
+        raw_value: raw_value
+      properties:
+        raw_value:
+          format: byte
+          pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+          type: string
+      type: object
+    federationListDelegationResponse:
+      description: The response format to retrieve __Delegation__ objects.
+      example:
+        results:
+        - metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+        - metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+      properties:
+        results:
+          description: A list of Delegation objects.
+          items:
+            $ref: '#/components/schemas/federationDelegation'
+          type: array
+      title: ListDelegationResponse
       type: object
     federationListFederatedBlockResponse:
       description: The response format to retrieve __FederatedBlock__ objects.
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         results:
           description: A list of FederatedBlock objects.
@@ -1449,33 +3134,137 @@ components:
           type: array
       title: ListFederatedBlockResponse
       type: object
+    federationListFederatedPoolResponse:
+      description: The response format to retrieve __FederatedPool__ objects.
+      example:
+        page:
+          offset: 0
+          size: 6
+          page_token: page_token
+        results:
+        - parent: parent
+          allocation:
+            forward_looking_delegation: 1
+            reserved: 5
+            overlapping: 5
+            delegated: 6
+            allocated: 0
+          metadata: "{}"
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          utilization: 14
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          id: id
+          state: state
+          region: region
+          network_compliant: true
+        - parent: parent
+          allocation:
+            forward_looking_delegation: 1
+            reserved: 5
+            overlapping: 5
+            delegated: 6
+            allocated: 0
+          metadata: "{}"
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          utilization: 14
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          id: id
+          state: state
+          region: region
+          network_compliant: true
+      properties:
+        page:
+          $ref: '#/components/schemas/apiPageInfo'
+        results:
+          description: A list of FederatedPool objects.
+          items:
+            $ref: '#/components/schemas/federationFederatedPool'
+          type: array
+      title: ListFederatedPoolResponse
+      type: object
     federationListFederatedRealmResponse:
       description: The response format to retrieve __FederatedRealm__ objects.
       example:
+        page:
+          offset: 0
+          size: 6
+          page_token: page_token
         results:
-        - updated_at: 2000-01-23T04:56:07.000+00:00
+        - metadata: "{}"
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           comment: comment
+          utilization: 0
           id: id
+          region: region
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
           tags: "{}"
-        - updated_at: 2000-01-23T04:56:07.000+00:00
+        - metadata: "{}"
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           comment: comment
+          utilization: 0
           id: id
+          region: region
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
           tags: "{}"
       properties:
+        page:
+          $ref: '#/components/schemas/apiPageInfo'
         results:
           description: The list of FederatedRealm objects.
           items:
@@ -1483,42 +3272,114 @@ components:
           type: array
       title: ListFederatedRealmResponse
       type: object
+    federationListForwardLookingDelegationResponse:
+      description: The response format to retrieve __ForwardLookingDelegation__ objects.
+      example:
+        results:
+        - federated_pool_id: federated_pool_id
+          protocol: protocol
+          address: address
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
+          tags: "{}"
+        - federated_pool_id: federated_pool_id
+          protocol: protocol
+          address: address
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
+          tags: "{}"
+      properties:
+        results:
+          description: A list of __ForwardLookingDelegation__ objects.
+          items:
+            $ref: '#/components/schemas/federationForwardLookingDelegation'
+          type: array
+      title: ListForwardLookingDelegationResponse
+      type: object
     federationListNextAvailableFederatedBlockResponse:
       description: The response format to list next available __FederatedBlock__ objects.
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         results:
           items:
@@ -1532,27 +3393,31 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
       properties:
         results:
           items:
@@ -1565,27 +3430,35 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         results:
           items:
@@ -1598,27 +3471,31 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
         - parent: parent
-          protocol: protocol
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          network_compliant: true
       properties:
         results:
           description: A list of OverlappingBlock objects.
@@ -1632,27 +3509,35 @@ components:
       example:
         results:
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
         - parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         results:
           description: A list of ReservedBlock objects.
@@ -1660,6 +3545,173 @@ components:
             $ref: '#/components/schemas/federationReservedBlock'
           type: array
       title: ListReservedBlockResponse
+      type: object
+    federationManageScopeTokenRequest:
+      description: The request format to generate an authentication token for AWS
+        IPAM scope.
+      properties:
+        account_id:
+          description: The Infoblox account ID for which the token is generated.
+          type: string
+        scope_arn:
+          title: |-
+            The AWS IPAM scope ARN for which the token is generated.
+            Format: arn:aws:ec2:region:account-id:ipam-scope/ipam-scope-id
+          type: string
+        ttl:
+          description: |-
+            Optional token expiration duration in seconds. Defaults to 300 (5 minutes) if not specified or set to 0.
+            Maximum allowed: 86400 (24 hours), Minimum: 0 (uses default).
+          format: int64
+          maximum: 86400
+          type: integer
+      required:
+      - account_id
+      - scope_arn
+      title: ManageScopeTokenRequest
+      type: object
+    federationManageScopeTokenResponse:
+      description: The response format containing the generated authentication token
+        and metadata.
+      example:
+        token: token
+      properties:
+        token:
+          description: JWT authentication token for the specified AWS IPAM scope
+          readOnly: true
+          type: string
+      title: ManageScopeTokenResponse
+      type: object
+    federationNetworkCompliance:
+      description: The __NetworkCompliance__ represents the network compliance of
+        federated pool and federated block.
+      example:
+        minimum_netmask_length: 3
+        default_netmask_length: 7
+        maximum_netmask_length: 9
+      properties:
+        default_netmask_length:
+          description: The default netmask length used when allocating child blocks
+            or pools.
+          format: int64
+          type: integer
+        maximum_netmask_length:
+          description: The maximum netmask length for allocating child blocks or pools.
+          format: int64
+          type: integer
+        minimum_netmask_length:
+          description: The minimum netmask length for allocating child blocks or pools.
+          format: int64
+          type: integer
+      title: NetworkCompliance
+      type: object
+    federationNextAppropriateDelegation:
+      properties:
+        cidr:
+          description: The CIDR Prefix Length of the required __Delegation__ object.
+            This is a required field.
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        count:
+          description: The count of the unique allocation with the provided CIDR.
+            If not present then it will default to 1.
+          format: int64
+          type: integer
+        delegated_to:
+          description: "The identifier, which denotes as to whom the allocation would\
+            \ belong to. This field would take the format of <provider_name>://<resource_to_be_assigned_to_id>.\
+            \ Like for AWS, it will be aws://<scope_arn>."
+          type: string
+        exclusions:
+          description: The exclusions are the list of address prefixes (in the form
+            of __IP_ADDRESS__/__CIDR__) which should be excluded while calculating
+            for available allocations. This is an optional parameter.
+          items:
+            type: string
+          type: array
+        idempotency_key:
+          description: "If the idempotency key is provided, a previously successful\
+            \ request using an identical key will be returned rather than being processed\
+            \ as an additional request."
+          type: string
+        inclusions:
+          description: The inclusions are the list of address prefixes (in the form
+            of __IP_ADDRESS__/__CIDR__) which should be considered while calculating
+            for available allocations. This is an optional parameter.
+          items:
+            type: string
+          type: array
+        name:
+          description: The name of the __Delegation__ object created.
+          type: string
+        pool_id:
+          description: "The unique identifier of the foreign __IPAM__ __Pool__ for\
+            \ which the request is being made, so that addresses appropriate for the\
+            \ __Pool__ may be selected."
+          type: string
+        protocol:
+          description: The version of the address (_ip4_ or _ip6_). If not present
+            then it will default to _ip4_.
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the __Delegation__ object created. It will be
+            a JSON object.
+          type: object
+      type: object
+    federationNextAppropriateDelegationResponse:
+      description: The response format to retrieve __Delegation__ objects.
+      example:
+        results:
+        - metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+        - metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+      properties:
+        results:
+          description: A list of __Delegation__ objects.
+          items:
+            $ref: '#/components/schemas/federationDelegation'
+          type: array
+      title: NextAppropriateDelegationResponse
       type: object
     federationNextAvailableBlockRequest:
       properties:
@@ -1679,6 +3731,9 @@ components:
             \ default to 1."
           format: int64
           type: integer
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
         id:
           description: The resource identifier.
           readOnly: true
@@ -1691,6 +3746,126 @@ components:
           description: The tags for the federated block in JSON format.
           type: object
       type: object
+    federationNextAvailableFLDPoolRequest:
+      description: Request to list or allocate the next available __ForwardLookingDelegation__
+        objects within a specific _federated_pool_.
+      properties:
+        cidr:
+          description: The CIDR prefix length of the __ForwardLookingDelegation__
+            to allocate. Required.
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        comment:
+          description: The description for the allocated __ForwardLookingDelegation__
+            objects. May contain 0 to 1024 characters. Can include UTF-8.
+          type: string
+        count:
+          description: The number of __ForwardLookingDelegation__ objects to allocate.
+            Defaults to 1 if not provided. Maximum is 20.
+          format: int64
+          type: integer
+        id:
+          description: The resource identifier.
+          readOnly: true
+          type: string
+        name:
+          description: The name to assign to the allocated __ForwardLookingDelegation__
+            objects.
+          type: string
+        protocol:
+          description: The IP version of the __ForwardLookingDelegation__ (_ip4_ or
+            _ip6_). Defaults to _ip4_ if not provided.
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the allocated __ForwardLookingDelegation__ objects
+            in JSON format.
+          type: object
+      required:
+      - cidr
+      - id
+      title: NextAvailableFLDPoolRequest
+      type: object
+    federationNextAvailableFLDRequest:
+      description: "A __ForwardLookingDelegation__ object (_federation/forward_looking_delegation_)\
+        \ is a set of contiguous IP addresses with no gap, expressed as a CIDR block.\
+        \ It may be used to allocate unique space for future resources which will\
+        \ ultimately hold a Delegation for the same CIDR block."
+      properties:
+        cidr:
+          description: The CIDR of the __ForwardLookingDelegation__. This is required.
+          format: int64
+          maximum: 128
+          minimum: 1
+          type: integer
+        comment:
+          description: The description for the __ForwardLookingDelegation__. May contain
+            0 to 1024 characters. Can include UTF-8.
+          type: string
+        count:
+          description: "The count of __ForwardLookingDelegation__ required. If not\
+            \ provided, it will default to 1."
+          format: int64
+          type: integer
+        name:
+          description: The name to be provided.
+          type: string
+        protocol:
+          description: The version of the address (_ip4_ or _ip6_). If not present
+            then it will default to _ip4_.
+          type: string
+        tags:
+          additionalProperties: false
+          description: The tags for the __ForwardLookingDelegation__ in JSON format.
+            The tag will be used to identify the federated blocks which should be
+            considered for __ForwardLookingDelegation__.
+          type: object
+      required:
+      - cidr
+      title: ForwardLookingDelegationRequest
+      type: object
+    federationNextAvailableFLDResponse:
+      description: The response format to list next available __ForwardLookingDelegation__
+        objects.
+      example:
+        results:
+        - federated_pool_id: federated_pool_id
+          protocol: protocol
+          address: address
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
+          tags: "{}"
+        - federated_pool_id: federated_pool_id
+          protocol: protocol
+          address: address
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
+          tags: "{}"
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/federationForwardLookingDelegation'
+          type: array
+      title: ListNextAvailableFLDResponse
+      type: object
     federationOverlappingBlock:
       description: "An __OverlappingBlock__ object (_federation/overlapping_block_)\
         \ is a set of contiguous IP addresses with no gap, expressed as a CIDR block.\
@@ -1701,16 +3876,18 @@ components:
         \ IPAM services."
       example:
         parent: parent
-        protocol: protocol
         address: address
         federated_realm: federated_realm
+        created_at: 2000-01-23T04:56:07.000+00:00
+        tags: "{}"
+        federated_pool_id: federated_pool_id
+        protocol: protocol
         updated_at: 2000-01-23T04:56:07.000+00:00
         name: name
-        created_at: 2000-01-23T04:56:07.000+00:00
         cidr: 11
         comment: comment
         id: id
-        tags: "{}"
+        network_compliant: true
       properties:
         address:
           description: "The address field in form “a.b.c.d/n” where the “/n” may be\
@@ -1734,6 +3911,9 @@ components:
           format: date-time
           readOnly: true
           type: string
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
         federated_realm:
           description: The resource identifier.
           type: string
@@ -1745,6 +3925,12 @@ components:
           description: The name of the overlapping block. May contain 1 to 256 characters.
             Can include UTF-8.
           type: string
+        network_compliant:
+          description: "The compliance status of the overlapping block, as determined\
+            \ by the federation service."
+          format: boolean
+          readOnly: true
+          type: boolean
         parent:
           description: The resource identifier.
           type: string
@@ -1767,43 +3953,155 @@ components:
       - federated_realm
       title: OverlappingBlock
       type: object
+    federationProviderType:
+      default: NIOS_X
+      description: |-
+        - NIOS_X: Infoblox NIOS-X
+         - NIOS: Infoblox NIOS
+         - AWS: Amazon Web Services
+         - AZURE: Microsoft Azure
+         - GCP: Google Cloud Platform
+         - MSAD: Microsoft Active Directory
+      enum:
+      - NIOS_X
+      - NIOS
+      - AWS
+      - AZURE
+      - GCP
+      - MSAD
+      title: ProviderType defines the supported provider types for federated resources
+      type: string
+    federationReadDelegationResponse:
+      description: The response format to retrieve the __Delegation__ object.
+      example:
+        result:
+          metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+      properties:
+        result:
+          $ref: '#/components/schemas/federationDelegation'
+      title: ReadDelegationResponse
+      type: object
     federationReadFederatedBlockResponse:
       description: The response format to retrieve the __FederatedBlock__ object.
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         result:
           $ref: '#/components/schemas/federationFederatedBlock'
       title: ReadFederatedBlockResponse
       type: object
+    federationReadFederatedPoolResponse:
+      description: The response format to retrieve the __FederatedPool__ object.
+      example:
+        result:
+          parent: parent
+          allocation:
+            forward_looking_delegation: 1
+            reserved: 5
+            overlapping: 5
+            delegated: 6
+            allocated: 0
+          metadata: "{}"
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          utilization: 14
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          id: id
+          state: state
+          region: region
+          network_compliant: true
+      properties:
+        result:
+          $ref: '#/components/schemas/federationFederatedPool'
+      title: ReadFederatedPoolResponse
+      type: object
     federationReadFederatedRealmResponse:
       description: The response format to retrieve the __FederatedRealm__ object.
       example:
         result:
+          metadata: "{}"
           updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           comment: comment
+          utilization: 0
           id: id
+          region: region
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
           tags: "{}"
@@ -1812,21 +4110,47 @@ components:
           $ref: '#/components/schemas/federationFederatedRealm'
       title: ReadFederatedRealmResponse
       type: object
-    federationReadOverlappingBlockResponse:
-      description: The response format to retrieve the __OverlappingBlock__ object.
+    federationReadForwardLookingDelegationResponse:
+      description: The response format to retrieve the __ForwardLookingDelegation__
+        object.
       example:
         result:
-          parent: parent
+          federated_pool_id: federated_pool_id
           protocol: protocol
           address: address
-          federated_realm: federated_realm
           updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
+          network_compliant: true
           tags: "{}"
+      properties:
+        result:
+          $ref: '#/components/schemas/federationForwardLookingDelegation'
+      title: ReadForwardLookingDelegationResponse
+      type: object
+    federationReadOverlappingBlockResponse:
+      description: The response format to retrieve the __OverlappingBlock__ object.
+      example:
+        result:
+          parent: parent
+          address: address
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationOverlappingBlock'
@@ -1837,16 +4161,20 @@ components:
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationReservedBlock'
@@ -1860,16 +4188,20 @@ components:
         \ IPAM services must not make allocations in this range."
       example:
         parent: parent
-        protocol: protocol
+        metadata: "{}"
         address: address
         federated_realm: federated_realm
+        created_at: 2000-01-23T04:56:07.000+00:00
+        tags: "{}"
+        federated_pool_id: federated_pool_id
+        protocol: protocol
         updated_at: 2000-01-23T04:56:07.000+00:00
         name: name
-        created_at: 2000-01-23T04:56:07.000+00:00
         cidr: 11
         comment: comment
         id: id
-        tags: "{}"
+        region: region
+        network_compliant: true
       properties:
         address:
           description: "The address field in form “a.b.c.d/n” where the “/n” may be\
@@ -1893,6 +4225,9 @@ components:
           format: date-time
           readOnly: true
           type: string
+        federated_pool_id:
+          description: The resource identifier.
+          type: string
         federated_realm:
           description: The resource identifier.
           type: string
@@ -1900,16 +4235,29 @@ components:
           description: The resource identifier.
           readOnly: true
           type: string
+        metadata:
+          additionalProperties: false
+          description: The metadata for the reserved block in JSON format.
+          type: object
         name:
           description: The name of the reserved block. May contain 1 to 256 characters.
             Can include UTF-8.
           type: string
+        network_compliant:
+          description: "The compliance status of the reserved block, as determined\
+            \ by the federation service."
+          format: boolean
+          readOnly: true
+          type: boolean
         parent:
           description: The resource identifier.
           type: string
         protocol:
           description: The type of protocol of reserved block (_ip4_ or _ip6_).
           readOnly: true
+          type: string
+        region:
+          description: The region where the reserved block is located.
           type: string
         tags:
           additionalProperties: false
@@ -1926,43 +4274,166 @@ components:
       - federated_realm
       title: ReservedBlock
       type: object
+    federationScopeManagementObject:
+      description: The scope management configuration details.
+      example:
+        scope_arn: scope_arn
+        enable: true
+      properties:
+        enable:
+          description: Whether to enable (true) or disable (false) scope management.
+            Defaults to false if not specified.
+          format: boolean
+          type: boolean
+        scope_arn:
+          description: AWS IPAM scope ARN to be set as externally managed
+          type: string
+      required:
+      - scope_arn
+      title: ScopeManagementObject
+      type: object
+    federationScopeManagementResponse:
+      description: The response format for scope management operations.
+      example:
+        result:
+          scope_arn: scope_arn
+          enable: true
+      properties:
+        result:
+          $ref: '#/components/schemas/federationScopeManagementObject'
+      title: ScopeManagementResponse
+      type: object
+    federationUpdateDelegationResponse:
+      description: The response format to update the __Delegation__ object.
+      example:
+        result:
+          metadata: "{}"
+          address: address
+          federated_realms:
+          - federated_realms
+          - federated_realms
+          created_at: 2000-01-23T04:56:07.000+00:00
+          utilization: 60
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          delegated_to: delegated_to
+          id: id
+          region: region
+          parents:
+          - parents
+          - parents
+      properties:
+        result:
+          $ref: '#/components/schemas/federationDelegation'
+      title: UpdateDelegationResponse
+      type: object
     federationUpdateFederatedBlockResponse:
       description: The response format to update the __FederatedBlock__ object.
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          name: name
           created_at: 2000-01-23T04:56:07.000+00:00
-          cidr: 72
+          utilization: 2
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          cidr: 30
           comment: comment
           id: id
+          state: state
+          region: region
+          network_compliant: true
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
-          tags: "{}"
       properties:
         result:
           $ref: '#/components/schemas/federationFederatedBlock'
       title: UpdateFederatedBlockResponse
       type: object
+    federationUpdateFederatedPoolResponse:
+      description: The response format to update the __FederatedPool__ object.
+      example:
+        result:
+          parent: parent
+          allocation:
+            forward_looking_delegation: 1
+            reserved: 5
+            overlapping: 5
+            delegated: 6
+            allocated: 0
+          metadata: "{}"
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          utilization: 14
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
+          tags: "{}"
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
+          network_compliance:
+            minimum_netmask_length: 3
+            default_netmask_length: 7
+            maximum_netmask_length: 9
+          name: name
+          id: id
+          state: state
+          region: region
+          network_compliant: true
+      properties:
+        result:
+          $ref: '#/components/schemas/federationFederatedPool'
+      title: UpdateFederatedPoolResponse
+      type: object
     federationUpdateFederatedRealmResponse:
       description: The response format to update the __FederatedRealm__ object.
       example:
         result:
+          metadata: "{}"
           updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: null
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           comment: comment
+          utilization: 0
           id: id
+          region: region
+          utilization_v6:
+            total:
+              raw_value: raw_value
+            used:
+              raw_value: raw_value
           allocation_v4:
+            forward_looking_delegation: 1
             reserved: 5
-            overlapping: 1
+            overlapping: 5
             delegated: 6
             allocated: 0
           tags: "{}"
@@ -1971,21 +4442,47 @@ components:
           $ref: '#/components/schemas/federationFederatedRealm'
       title: UpdateFederatedRealmResponse
       type: object
-    federationUpdateOverlappingBlockResponse:
-      description: The response format to update the __OverlappingBlock__ object.
+    federationUpdateForwardLookingDelegationResponse:
+      description: The response format to update the __ForwardLookingDelegation__
+        object.
       example:
         result:
-          parent: parent
+          federated_pool_id: federated_pool_id
           protocol: protocol
           address: address
-          federated_realm: federated_realm
           updated_at: 2000-01-23T04:56:07.000+00:00
+          federated_realms:
+          - federated_realms
+          - federated_realms
           name: name
           created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
+          network_compliant: true
           tags: "{}"
+      properties:
+        result:
+          $ref: '#/components/schemas/federationForwardLookingDelegation'
+      title: UpdateForwardLookingDelegationResponse
+      type: object
+    federationUpdateOverlappingBlockResponse:
+      description: The response format to update the __OverlappingBlock__ object.
+      example:
+        result:
+          parent: parent
+          address: address
+          federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          cidr: 11
+          comment: comment
+          id: id
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationOverlappingBlock'
@@ -1996,23 +4493,43 @@ components:
       example:
         result:
           parent: parent
-          protocol: protocol
+          metadata: "{}"
           address: address
           federated_realm: federated_realm
+          created_at: 2000-01-23T04:56:07.000+00:00
+          tags: "{}"
+          federated_pool_id: federated_pool_id
+          protocol: protocol
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
-          created_at: 2000-01-23T04:56:07.000+00:00
           cidr: 11
           comment: comment
           id: id
-          tags: "{}"
+          region: region
+          network_compliant: true
       properties:
         result:
           $ref: '#/components/schemas/federationReservedBlock'
       title: UpdateReservedBlockResponse
       type: object
+    federationUtilizationV6:
+      description: The __UtilizationV6__ represents IPv6 utilization metrics.
+      example:
+        total:
+          raw_value: raw_value
+        used:
+          raw_value: raw_value
+      properties:
+        total:
+          $ref: '#/components/schemas/federationInteger128'
+        used:
+          $ref: '#/components/schemas/federationInteger128'
+      title: UtilizationV6
+      type: object
   securitySchemes:
     ApiKeyAuth:
+      description: "Please provide below your API key with the _Token_ prefix, e.g.\
+        \ _Token &lt;YOUR API KEY&gt;_"
       in: header
       name: Authorization
       type: apiKey

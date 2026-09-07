@@ -19,7 +19,7 @@ The following Universal DDI APIs are supported:
 - [IP Address Management](ipam/README.md)
 - [DNS Configuration](dns_config/README.md)
 - [DNS Data](dns_data/README.md)
-- [Keys](keys/README.md)
+- [DNS Traffic Control](dtc/README.md- [Keys](keys/README.md)
 
 # Migrating from bloxone-go-client
 

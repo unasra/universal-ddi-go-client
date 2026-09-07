@@ -23,6 +23,20 @@ func TestNextAvailableReservedBlockAPIService(t *testing.T) {
 
 	apiClient := ipamfederation.NewAPIClient()
 
+	t.Run("Test NextAvailableReservedBlockAPIService CreateNextAvailableReservedBlocks", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var id string
+
+		resp, httpRes, err := apiClient.NextAvailableReservedBlockAPI.CreateNextAvailableReservedBlocks(context.Background(), id).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test NextAvailableReservedBlockAPIService ListNextAvailableReservedBlocks", func(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test

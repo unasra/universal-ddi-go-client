@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Page** | Pointer to [**ApiPageInfo**](ApiPageInfo.md) | Page information including total_size when is_total_size_needed is requested. | [optional] 
 **Results** | Pointer to [**[]FederatedRealm**](FederatedRealm.md) | The list of FederatedRealm objects. | [optional] 
 
 ## Methods
@@ -24,6 +25,31 @@ will change when the set of required properties is changed
 NewListFederatedRealmResponseWithDefaults instantiates a new ListFederatedRealmResponse object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetPage
+
+`func (o *ListFederatedRealmResponse) GetPage() ApiPageInfo`
+
+GetPage returns the Page field if non-nil, zero value otherwise.
+
+### GetPageOk
+
+`func (o *ListFederatedRealmResponse) GetPageOk() (*ApiPageInfo, bool)`
+
+GetPageOk returns a tuple with the Page field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPage
+
+`func (o *ListFederatedRealmResponse) SetPage(v ApiPageInfo)`
+
+SetPage sets Page field to given value.
+
+### HasPage
+
+`func (o *ListFederatedRealmResponse) HasPage() bool`
+
+HasPage returns a boolean if a field has been set.
 
 ### GetResults
 
