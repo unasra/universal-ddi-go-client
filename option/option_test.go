@@ -91,10 +91,12 @@ func TestWithRateLimiter(t *testing.T) {
 }
 
 func TestWithRateLimiterNil(t *testing.T) {
-	config := &internal.Configuration{}
+	config := &internal.Configuration{
+		RateLimiter: &mockRateLimiter{},
+	}
 	opt := WithRateLimiter(nil)
 	opt(config)
-	assert.Nil(t, config.RateLimiter)
+	assert.NotNil(t, config.RateLimiter, "WithRateLimiter(nil) should not clear an existing limiter")
 }
 
 func TestWithRetry(t *testing.T) {
