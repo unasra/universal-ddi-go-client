@@ -96,15 +96,18 @@ func NewConfiguration() *Configuration {
 	rateLimit := lookupEnvFloat64(envRateLimit, defaultRateLimit)
 	if rateLimit > 0 {
 		burst := lookupEnvInt(envRateLimitBurst, int(math.Ceil(rateLimit)))
+		if burst < 1 {
+			burst = 1
+		}
 		cfg.RateLimiter = rate.NewLimiter(rate.Limit(rateLimit), burst)
 	}
 
-	retryAttempts := lookupEnvInt(envRetryAttempts, DefaultRetryAttempts)
-	if retryAttempts > 0 {
+	maxRetries := lookupEnvInt(envMaxRetries, DefaultMaxRetries)
+	if maxRetries > 0 {
 		cfg.RetryConfig = &RetryConfig{
-			MaxAttempts: retryAttempts,
-			MinWait:     lookupEnvDuration(envRetryMinWait, DefaultRetryMinWait),
-			MaxWait:     lookupEnvDuration(envRetryMaxWait, DefaultRetryMaxWait),
+			MaxRetries: maxRetries,
+			MinWait:    lookupEnvDuration(envRetryMinWait, DefaultRetryMinWait),
+			MaxWait:    lookupEnvDuration(envRetryMaxWait, DefaultRetryMaxWait),
 		}
 	}
 

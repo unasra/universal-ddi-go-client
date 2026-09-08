@@ -1,8 +1,11 @@
 package internal
 
 import (
+	"crypto/x509"
+	"errors"
 	"math"
 	"math/rand"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,9 +13,9 @@ import (
 
 // RetryConfig controls automatic retry behavior for transient HTTP errors.
 type RetryConfig struct {
-	MaxAttempts int
-	MinWait     time.Duration
-	MaxWait     time.Duration
+	MaxRetries int
+	MinWait    time.Duration
+	MaxWait    time.Duration
 }
 
 func isRetryableStatusCode(statusCode int) bool {
@@ -48,18 +51,31 @@ func parseRetryAfter(resp *http.Response) time.Duration {
 }
 
 func retryBackoff(attempt int, minWait, maxWait time.Duration) time.Duration {
-	wait := float64(minWait) * math.Pow(2, float64(attempt))
-	if wait > float64(maxWait) {
-		wait = float64(maxWait)
+	cap := float64(minWait) * math.Pow(2, float64(attempt))
+	if cap > float64(maxWait) {
+		cap = float64(maxWait)
 	}
+	return time.Duration(rand.Float64() * cap)
+}
 
-	// Add jitter: ±25% of the computed wait
-	jitter := wait * 0.25 * (rand.Float64()*2 - 1)
-	wait += jitter
-
-	if wait < float64(minWait) {
-		wait = float64(minWait)
+// isRetryableError reports whether err represents a transient condition
+// worth retrying. Permanent transport errors (DNS not found, invalid or
+// unknown-authority TLS certificates) are excluded from retry.
+func isRetryableError(err error) bool {
+	if err == nil {
+		return false
 	}
-
-	return time.Duration(wait)
+	var dnsErr *net.DNSError
+	if errors.As(err, &dnsErr) && dnsErr.IsNotFound {
+		return false
+	}
+	var certInvalidErr *x509.CertificateInvalidError
+	if errors.As(err, &certInvalidErr) {
+		return false
+	}
+	var unknownAuthErr *x509.UnknownAuthorityError
+	if errors.As(err, &unknownAuthErr) {
+		return false
+	}
+	return true
 }

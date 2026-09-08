@@ -74,7 +74,7 @@ func TestCallAPIRateLimiterContextCancelled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, server.URL, nil)
 	require.NoError(t, err)
 
 	_, err = client.CallAPI(req)
@@ -82,6 +82,37 @@ func TestCallAPIRateLimiterContextCancelled(t *testing.T) {
 }
 
 func TestCallAPIRateLimiterThroughput(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	requestsPerSecond := 20.0
+	cfg := &Configuration{
+		HTTPClient:  server.Client(),
+		RateLimiter: rate.NewLimiter(rate.Limit(requestsPerSecond), 1),
+	}
+	client := &APIClient{Cfg: cfg}
+
+	totalRequests := 10
+	start := time.Now()
+
+	for i := 0; i < totalRequests; i++ {
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
+		require.NoError(t, err)
+
+		resp, err := client.CallAPI(req)
+		require.NoError(t, err)
+		resp.Body.Close()
+	}
+
+	elapsed := time.Since(start)
+	expectedMin := time.Duration(float64(totalRequests-1)/requestsPerSecond*1000) * time.Millisecond
+	assert.GreaterOrEqual(t, elapsed, expectedMin-50*time.Millisecond,
+		"requests completed too quickly, rate limiter may not be working")
+}
+
+func TestCallAPIRateLimiterSkipsGET(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
@@ -107,9 +138,8 @@ func TestCallAPIRateLimiterThroughput(t *testing.T) {
 	}
 
 	elapsed := time.Since(start)
-	expectedMin := time.Duration(float64(totalRequests-1)/requestsPerSecond*1000) * time.Millisecond
-	assert.GreaterOrEqual(t, elapsed, expectedMin-50*time.Millisecond,
-		"requests completed too quickly, rate limiter may not be working")
+	assert.Less(t, elapsed, 200*time.Millisecond,
+		"GET requests should not be throttled by the rate limiter")
 }
 
 func TestNewConfigurationDefaultRateLimit(t *testing.T) {

@@ -38,16 +38,16 @@ const (
 	envRateLimit      = "INFOBLOX_RATE_LIMIT"
 	envRateLimitBurst = "INFOBLOX_RATE_LIMIT_BURST"
 
-	envRetryAttempts = "INFOBLOX_RETRY_ATTEMPTS"
-	envRetryMinWait  = "INFOBLOX_RETRY_MIN_WAIT"
-	envRetryMaxWait  = "INFOBLOX_RETRY_MAX_WAIT"
+	envMaxRetries   = "INFOBLOX_MAX_RETRIES"
+	envRetryMinWait = "INFOBLOX_RETRY_MIN_WAIT"
+	envRetryMaxWait = "INFOBLOX_RETRY_MAX_WAIT"
 
 	defaultRateLimit      float64 = 25
 	defaultRateLimitBurst int     = 25
 
-	DefaultRetryAttempts = 3
-	DefaultRetryMinWait  = 1 * time.Second
-	DefaultRetryMaxWait  = 30 * time.Second
+	DefaultMaxRetries   = 3
+	DefaultRetryMinWait = 1 * time.Second
+	DefaultRetryMaxWait = 30 * time.Second
 
 	version       = "0.1"
 	sdkIdentifier = "golang-sdk"
@@ -312,14 +312,14 @@ func redactCredentials(header http.Header) func() {
 
 // CallAPI do the request.
 func (c *APIClient) CallAPI(request *http.Request) (*http.Response, error) {
-	if c.Cfg.RateLimiter != nil {
+	if c.Cfg.RateLimiter != nil && request.Method != http.MethodGet {
 		if err := c.Cfg.RateLimiter.Wait(request.Context()); err != nil {
 			return nil, err
 		}
 	}
 
 	var bodyBytes []byte
-	if request.Body != nil && c.Cfg.RetryConfig != nil && c.Cfg.RetryConfig.MaxAttempts > 0 {
+	if request.Body != nil && c.Cfg.RetryConfig != nil && c.Cfg.RetryConfig.MaxRetries > 0 {
 		var err error
 		bodyBytes, err = io.ReadAll(request.Body)
 		if err != nil {
@@ -328,20 +328,20 @@ func (c *APIClient) CallAPI(request *http.Request) (*http.Response, error) {
 		request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 	}
 
-	maxAttempts := 0
+	maxRetries := 0
 	if c.Cfg.RetryConfig != nil {
-		maxAttempts = c.Cfg.RetryConfig.MaxAttempts
+		maxRetries = c.Cfg.RetryConfig.MaxRetries
 	}
 
 	var resp *http.Response
 	var err error
 
-	for attempt := 0; attempt <= maxAttempts; attempt++ {
+	for attempt := 0; attempt <= maxRetries; attempt++ {
 		if attempt > 0 {
 			if bodyBytes != nil {
 				request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 			}
-			if c.Cfg.RateLimiter != nil {
+			if c.Cfg.RateLimiter != nil && request.Method != http.MethodGet {
 				if err := c.Cfg.RateLimiter.Wait(request.Context()); err != nil {
 					return nil, err
 				}
@@ -360,10 +360,10 @@ func (c *APIClient) CallAPI(request *http.Request) (*http.Response, error) {
 
 		resp, err = c.Cfg.HTTPClient.Do(request)
 		if err != nil {
-			if attempt < maxAttempts {
+			if attempt < maxRetries && isRetryableError(err) {
 				wait := retryBackoff(attempt, c.Cfg.RetryConfig.MinWait, c.Cfg.RetryConfig.MaxWait)
 				if c.Cfg.Debug {
-					log.Printf("Request error, attempt %d/%d, waiting %s: %v", attempt+1, maxAttempts, wait, err)
+					log.Printf("Request error, attempt %d/%d, waiting %s: %v", attempt+1, maxRetries, wait, err)
 				}
 				select {
 				case <-time.After(wait):
@@ -385,7 +385,7 @@ func (c *APIClient) CallAPI(request *http.Request) (*http.Response, error) {
 			log.Printf("\n%s\n", string(dump))
 		}
 
-		if !isRetryableStatusCode(resp.StatusCode) || attempt >= maxAttempts {
+		if !isRetryableStatusCode(resp.StatusCode) || attempt >= maxRetries {
 			break
 		}
 
@@ -398,7 +398,7 @@ func (c *APIClient) CallAPI(request *http.Request) (*http.Response, error) {
 		}
 
 		if c.Cfg.Debug {
-			log.Printf("Retryable status %d, attempt %d/%d, waiting %s", resp.StatusCode, attempt+1, maxAttempts, wait)
+			log.Printf("Retryable status %d, attempt %d/%d, waiting %s", resp.StatusCode, attempt+1, maxRetries, wait)
 		}
 
 		io.Copy(io.Discard, resp.Body)
