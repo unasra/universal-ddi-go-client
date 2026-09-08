@@ -138,6 +138,8 @@ The SDK includes a built-in token-bucket rate limiter that throttles outbound AP
 
 **The rate limiter is enabled by default at 25 requests per second with a burst size of 25.** No configuration is needed for most use cases.
 
+> **Note:** Read-only operations (`GET` requests) are excluded from rate limiting. Only mutating operations (`POST`, `PUT`, `PATCH`, `DELETE`) are throttled.
+
 #### Environment Variables
 
 You can tune or disable the rate limiter using environment variables:
@@ -176,7 +178,7 @@ You can also provide a custom rate limiter implementation using `option.WithRate
 client := uddiclient.NewAPIClient(option.WithRateLimiter(myCustomLimiter))
 ```
 
-The custom limiter must implement the `internal.RateLimiter` interface:
+The custom limiter must implement the `option.RateLimiter` interface:
 
 ```go
 type RateLimiter interface {
@@ -188,7 +190,7 @@ type RateLimiter interface {
 
 The SDK automatically retries requests that fail with transient HTTP errors. This handles temporary server-side issues without requiring callers to implement their own retry logic.
 
-**Retry is enabled by default with 3 attempts, exponential backoff (1s–30s), and jitter.** The following HTTP status codes are retried:
+**Retry is enabled by default with 3 retries, exponential backoff (1s–30s), and full jitter.** The following HTTP status codes are retried:
 - `429 Too Many Requests`
 - `500 Internal Server Error`
 - `502 Bad Gateway`
@@ -197,22 +199,24 @@ The SDK automatically retries requests that fail with transient HTTP errors. Thi
 
 When the server returns a `Retry-After` header with a `429` response, the SDK respects the indicated wait duration (capped to the configured maximum wait).
 
+Permanent transport errors — such as DNS `NXDOMAIN` (host not found) and invalid TLS certificates — are not retried.
+
 #### Environment Variables
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `INFOBLOX_RETRY_ATTEMPTS` | int | `3` | Maximum number of retry attempts. Set to `0` to disable retry. |
+| `INFOBLOX_MAX_RETRIES` | int | `3` | Maximum number of retry attempts. Set to `0` to disable retry. |
 | `INFOBLOX_RETRY_MIN_WAIT` | duration | `1s` | Minimum backoff between retries. |
 | `INFOBLOX_RETRY_MAX_WAIT` | duration | `30s` | Maximum backoff between retries. |
 
 ```bash
 # Override retry settings
-export INFOBLOX_RETRY_ATTEMPTS=5
+export INFOBLOX_MAX_RETRIES=5
 export INFOBLOX_RETRY_MIN_WAIT=2s
 export INFOBLOX_RETRY_MAX_WAIT=1m
 
 # Disable retry entirely
-export INFOBLOX_RETRY_ATTEMPTS=0
+export INFOBLOX_MAX_RETRIES=0
 ```
 
 #### Programmatic Configuration

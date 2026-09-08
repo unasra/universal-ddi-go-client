@@ -99,19 +99,40 @@ func TestWithRateLimiterNil(t *testing.T) {
 	assert.NotNil(t, config.RateLimiter, "WithRateLimiter(nil) should not clear an existing limiter")
 }
 
+func TestWithRateLimitZeroDisables(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRateLimit(0, 10)
+	opt(config)
+	assert.Nil(t, config.RateLimiter, "rate <= 0 should disable the rate limiter")
+}
+
+func TestWithRateLimitNegativeDisables(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRateLimit(-5, 10)
+	opt(config)
+	assert.Nil(t, config.RateLimiter, "negative rate should disable the rate limiter")
+}
+
+func TestWithRateLimitBurstClampsToOne(t *testing.T) {
+	config := &internal.Configuration{}
+	opt := WithRateLimit(10, 0)
+	opt(config)
+	assert.NotNil(t, config.RateLimiter, "burst 0 should be clamped to 1, not cause failure")
+}
+
 func TestWithRetry(t *testing.T) {
 	config := &internal.Configuration{}
 	opt := WithRetry(5, 2*time.Second, 1*time.Minute)
 	opt(config)
 	require.NotNil(t, config.RetryConfig)
-	assert.Equal(t, 5, config.RetryConfig.MaxAttempts)
+	assert.Equal(t, 5, config.RetryConfig.MaxRetries)
 	assert.Equal(t, 2*time.Second, config.RetryConfig.MinWait)
 	assert.Equal(t, 1*time.Minute, config.RetryConfig.MaxWait)
 }
 
 func TestWithRetryZeroDisables(t *testing.T) {
 	config := &internal.Configuration{
-		RetryConfig: &internal.RetryConfig{MaxAttempts: 3},
+		RetryConfig: &internal.RetryConfig{MaxRetries: 3},
 	}
 	opt := WithRetry(0, 0, 0)
 	opt(config)
@@ -120,7 +141,7 @@ func TestWithRetryZeroDisables(t *testing.T) {
 
 func TestWithRetryDisabled(t *testing.T) {
 	config := &internal.Configuration{
-		RetryConfig: &internal.RetryConfig{MaxAttempts: 3},
+		RetryConfig: &internal.RetryConfig{MaxRetries: 3},
 	}
 	opt := WithRetryDisabled()
 	opt(config)
