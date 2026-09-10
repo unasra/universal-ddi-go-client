@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Cidr** | Pointer to **int64** | The CIDR of the federated block. This is required, if _address_ does not specify it in its input. | [optional] 
 **Comment** | Pointer to **string** | The description for the _federation/federated_block_. May contain 0 to 1024 characters. Can include UTF-8. | [optional] 
 **Count** | Pointer to **int64** | The count of __Block__ required. If not provided, it will default to 1. | [optional] 
+**FederatedPoolId** | Pointer to **string** | The resource identifier. | [optional] 
 **Id** | Pointer to **string** | The resource identifier. | [optional] [readonly] 
 **Name** | Pointer to **string** | The name to be provided. | [optional] 
 **Tags** | Pointer to **map[string]interface{}** | The tags for the federated block in JSON format. | [optional] 
@@ -104,6 +105,31 @@ SetCount sets Count field to given value.
 `func (o *NextAvailableBlockRequest) HasCount() bool`
 
 HasCount returns a boolean if a field has been set.
+
+### GetFederatedPoolId
+
+`func (o *NextAvailableBlockRequest) GetFederatedPoolId() string`
+
+GetFederatedPoolId returns the FederatedPoolId field if non-nil, zero value otherwise.
+
+### GetFederatedPoolIdOk
+
+`func (o *NextAvailableBlockRequest) GetFederatedPoolIdOk() (*string, bool)`
+
+GetFederatedPoolIdOk returns a tuple with the FederatedPoolId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFederatedPoolId
+
+`func (o *NextAvailableBlockRequest) SetFederatedPoolId(v string)`
+
+SetFederatedPoolId sets FederatedPoolId field to given value.
+
+### HasFederatedPoolId
+
+`func (o *NextAvailableBlockRequest) HasFederatedPoolId() bool`
+
+HasFederatedPoolId returns a boolean if a field has been set.
 
 ### GetId
 

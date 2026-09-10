@@ -8,11 +8,15 @@ Name | Type | Description | Notes
 **Cidr** | Pointer to **int64** | The CIDR of the reserved block. This is required field, if _address_ does not specify it in its input. | [optional] 
 **Comment** | Pointer to **string** | The description for the reserved block. May contain 0 to 1024 characters. Can include UTF-8. | [optional] 
 **CreatedAt** | Pointer to **time.Time** | Time when the object has been created. | [optional] [readonly] 
+**FederatedPoolId** | Pointer to **string** | The resource identifier. | [optional] 
 **FederatedRealm** | **string** | The resource identifier. | 
 **Id** | Pointer to **string** | The resource identifier. | [optional] [readonly] 
+**Metadata** | Pointer to **map[string]interface{}** | The metadata for the reserved block in JSON format. | [optional] 
 **Name** | Pointer to **string** | The name of the reserved block. May contain 1 to 256 characters. Can include UTF-8. | [optional] 
+**NetworkCompliant** | Pointer to **bool** | The compliance status of the reserved block, as determined by the federation service. | [optional] [readonly] 
 **Parent** | Pointer to **string** | The resource identifier. | [optional] 
 **Protocol** | Pointer to **string** | The type of protocol of reserved block (_ip4_ or _ip6_). | [optional] [readonly] 
+**Region** | Pointer to **string** | The region where the reserved block is located. | [optional] 
 **Tags** | Pointer to **map[string]interface{}** | The tags for the reserved block in JSON format. | [optional] 
 **UpdatedAt** | Pointer to **time.Time** | Time when the object has been updated. Equals to _created_at_ if not updated after creation. | [optional] [readonly] 
 
@@ -130,6 +134,31 @@ SetCreatedAt sets CreatedAt field to given value.
 
 HasCreatedAt returns a boolean if a field has been set.
 
+### GetFederatedPoolId
+
+`func (o *ReservedBlock) GetFederatedPoolId() string`
+
+GetFederatedPoolId returns the FederatedPoolId field if non-nil, zero value otherwise.
+
+### GetFederatedPoolIdOk
+
+`func (o *ReservedBlock) GetFederatedPoolIdOk() (*string, bool)`
+
+GetFederatedPoolIdOk returns a tuple with the FederatedPoolId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFederatedPoolId
+
+`func (o *ReservedBlock) SetFederatedPoolId(v string)`
+
+SetFederatedPoolId sets FederatedPoolId field to given value.
+
+### HasFederatedPoolId
+
+`func (o *ReservedBlock) HasFederatedPoolId() bool`
+
+HasFederatedPoolId returns a boolean if a field has been set.
+
 ### GetFederatedRealm
 
 `func (o *ReservedBlock) GetFederatedRealm() string`
@@ -175,6 +204,31 @@ SetId sets Id field to given value.
 
 HasId returns a boolean if a field has been set.
 
+### GetMetadata
+
+`func (o *ReservedBlock) GetMetadata() map[string]interface{}`
+
+GetMetadata returns the Metadata field if non-nil, zero value otherwise.
+
+### GetMetadataOk
+
+`func (o *ReservedBlock) GetMetadataOk() (*map[string]interface{}, bool)`
+
+GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetadata
+
+`func (o *ReservedBlock) SetMetadata(v map[string]interface{})`
+
+SetMetadata sets Metadata field to given value.
+
+### HasMetadata
+
+`func (o *ReservedBlock) HasMetadata() bool`
+
+HasMetadata returns a boolean if a field has been set.
+
 ### GetName
 
 `func (o *ReservedBlock) GetName() string`
@@ -199,6 +253,31 @@ SetName sets Name field to given value.
 `func (o *ReservedBlock) HasName() bool`
 
 HasName returns a boolean if a field has been set.
+
+### GetNetworkCompliant
+
+`func (o *ReservedBlock) GetNetworkCompliant() bool`
+
+GetNetworkCompliant returns the NetworkCompliant field if non-nil, zero value otherwise.
+
+### GetNetworkCompliantOk
+
+`func (o *ReservedBlock) GetNetworkCompliantOk() (*bool, bool)`
+
+GetNetworkCompliantOk returns a tuple with the NetworkCompliant field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNetworkCompliant
+
+`func (o *ReservedBlock) SetNetworkCompliant(v bool)`
+
+SetNetworkCompliant sets NetworkCompliant field to given value.
+
+### HasNetworkCompliant
+
+`func (o *ReservedBlock) HasNetworkCompliant() bool`
+
+HasNetworkCompliant returns a boolean if a field has been set.
 
 ### GetParent
 
@@ -249,6 +328,31 @@ SetProtocol sets Protocol field to given value.
 `func (o *ReservedBlock) HasProtocol() bool`
 
 HasProtocol returns a boolean if a field has been set.
+
+### GetRegion
+
+`func (o *ReservedBlock) GetRegion() string`
+
+GetRegion returns the Region field if non-nil, zero value otherwise.
+
+### GetRegionOk
+
+`func (o *ReservedBlock) GetRegionOk() (*string, bool)`
+
+GetRegionOk returns a tuple with the Region field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRegion
+
+`func (o *ReservedBlock) SetRegion(v string)`
+
+SetRegion sets Region field to given value.
+
+### HasRegion
+
+`func (o *ReservedBlock) HasRegion() bool`
+
+HasRegion returns a boolean if a field has been set.
 
 ### GetTags
 

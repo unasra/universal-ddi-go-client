@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Allocated** | Pointer to **int64** | Percent of total space allocated. | [optional] [readonly] 
 **Delegated** | Pointer to **int64** | Percent of total space delegated. | [optional] [readonly] 
+**ForwardLookingDelegation** | Pointer to **int64** | Percent of total space in forward looking delegation blocks. | [optional] [readonly] 
 **Overlapping** | Pointer to **int64** | Percent of total space in overlapping blocks. | [optional] [readonly] 
 **Reserved** | Pointer to **int64** | Percent of total space reserved. | [optional] [readonly] 
 
@@ -77,6 +78,31 @@ SetDelegated sets Delegated field to given value.
 `func (o *Allocation) HasDelegated() bool`
 
 HasDelegated returns a boolean if a field has been set.
+
+### GetForwardLookingDelegation
+
+`func (o *Allocation) GetForwardLookingDelegation() int64`
+
+GetForwardLookingDelegation returns the ForwardLookingDelegation field if non-nil, zero value otherwise.
+
+### GetForwardLookingDelegationOk
+
+`func (o *Allocation) GetForwardLookingDelegationOk() (*int64, bool)`
+
+GetForwardLookingDelegationOk returns a tuple with the ForwardLookingDelegation field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetForwardLookingDelegation
+
+`func (o *Allocation) SetForwardLookingDelegation(v int64)`
+
+SetForwardLookingDelegation sets ForwardLookingDelegation field to given value.
+
+### HasForwardLookingDelegation
+
+`func (o *Allocation) HasForwardLookingDelegation() bool`
+
+HasForwardLookingDelegation returns a boolean if a field has been set.
 
 ### GetOverlapping
 

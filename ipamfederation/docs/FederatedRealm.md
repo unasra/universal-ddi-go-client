@@ -8,9 +8,14 @@ Name | Type | Description | Notes
 **Comment** | Pointer to **string** | The description of the federated realm. May contain 0 to 1024 characters. Can include UTF-8. | [optional] 
 **CreatedAt** | Pointer to **time.Time** | Time when the object has been created. | [optional] [readonly] 
 **Id** | Pointer to **string** | The resource identifier. | [optional] [readonly] 
+**Metadata** | Pointer to **map[string]interface{}** | The metadata for the federated realm in JSON format. | [optional] 
 **Name** | **string** | The name of the federated realm. May contain 1 to 256 characters; can include UTF-8. | 
+**Provider** | Pointer to [**ProviderType**](ProviderType.md) | The provider type this realm is associated with. | [optional] [default to PROVIDERTYPE_NIOS_X]
+**Region** | Pointer to **string** | The region where the realm is located. | [optional] 
 **Tags** | Pointer to **map[string]interface{}** | The tags for the federated realm in JSON format. | [optional] 
 **UpdatedAt** | Pointer to **time.Time** | Time when the object has been updated. Equals to _created_at_ if not updated after creation. | [optional] [readonly] 
+**Utilization** | Pointer to **int64** | The percentage of Federated Realm utilization. | [optional] 
+**UtilizationV6** | Pointer to [**UtilizationV6**](UtilizationV6.md) | The IPv6 utilization metrics for the federated realm. | [optional] [readonly] 
 
 ## Methods
 
@@ -131,6 +136,31 @@ SetId sets Id field to given value.
 
 HasId returns a boolean if a field has been set.
 
+### GetMetadata
+
+`func (o *FederatedRealm) GetMetadata() map[string]interface{}`
+
+GetMetadata returns the Metadata field if non-nil, zero value otherwise.
+
+### GetMetadataOk
+
+`func (o *FederatedRealm) GetMetadataOk() (*map[string]interface{}, bool)`
+
+GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetadata
+
+`func (o *FederatedRealm) SetMetadata(v map[string]interface{})`
+
+SetMetadata sets Metadata field to given value.
+
+### HasMetadata
+
+`func (o *FederatedRealm) HasMetadata() bool`
+
+HasMetadata returns a boolean if a field has been set.
+
 ### GetName
 
 `func (o *FederatedRealm) GetName() string`
@@ -150,6 +180,56 @@ and a boolean to check if the value has been set.
 
 SetName sets Name field to given value.
 
+
+### GetProvider
+
+`func (o *FederatedRealm) GetProvider() ProviderType`
+
+GetProvider returns the Provider field if non-nil, zero value otherwise.
+
+### GetProviderOk
+
+`func (o *FederatedRealm) GetProviderOk() (*ProviderType, bool)`
+
+GetProviderOk returns a tuple with the Provider field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetProvider
+
+`func (o *FederatedRealm) SetProvider(v ProviderType)`
+
+SetProvider sets Provider field to given value.
+
+### HasProvider
+
+`func (o *FederatedRealm) HasProvider() bool`
+
+HasProvider returns a boolean if a field has been set.
+
+### GetRegion
+
+`func (o *FederatedRealm) GetRegion() string`
+
+GetRegion returns the Region field if non-nil, zero value otherwise.
+
+### GetRegionOk
+
+`func (o *FederatedRealm) GetRegionOk() (*string, bool)`
+
+GetRegionOk returns a tuple with the Region field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRegion
+
+`func (o *FederatedRealm) SetRegion(v string)`
+
+SetRegion sets Region field to given value.
+
+### HasRegion
+
+`func (o *FederatedRealm) HasRegion() bool`
+
+HasRegion returns a boolean if a field has been set.
 
 ### GetTags
 
@@ -200,6 +280,56 @@ SetUpdatedAt sets UpdatedAt field to given value.
 `func (o *FederatedRealm) HasUpdatedAt() bool`
 
 HasUpdatedAt returns a boolean if a field has been set.
+
+### GetUtilization
+
+`func (o *FederatedRealm) GetUtilization() int64`
+
+GetUtilization returns the Utilization field if non-nil, zero value otherwise.
+
+### GetUtilizationOk
+
+`func (o *FederatedRealm) GetUtilizationOk() (*int64, bool)`
+
+GetUtilizationOk returns a tuple with the Utilization field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUtilization
+
+`func (o *FederatedRealm) SetUtilization(v int64)`
+
+SetUtilization sets Utilization field to given value.
+
+### HasUtilization
+
+`func (o *FederatedRealm) HasUtilization() bool`
+
+HasUtilization returns a boolean if a field has been set.
+
+### GetUtilizationV6
+
+`func (o *FederatedRealm) GetUtilizationV6() UtilizationV6`
+
+GetUtilizationV6 returns the UtilizationV6 field if non-nil, zero value otherwise.
+
+### GetUtilizationV6Ok
+
+`func (o *FederatedRealm) GetUtilizationV6Ok() (*UtilizationV6, bool)`
+
+GetUtilizationV6Ok returns a tuple with the UtilizationV6 field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUtilizationV6
+
+`func (o *FederatedRealm) SetUtilizationV6(v UtilizationV6)`
+
+SetUtilizationV6 sets UtilizationV6 field to given value.
+
+### HasUtilizationV6
+
+`func (o *FederatedRealm) HasUtilizationV6() bool`
+
+HasUtilizationV6 returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
